@@ -16,3 +16,9 @@ agent-ui/node_modules/
 # rule above would drop them.
 !agent-ui/vendor/**/dist/
 !agent-ui/vendor/**/dist/**
+
+# ndemo scratch: a full Chrome profile and recording artefacts, not source
+.ndemo/
+demo/*/screenshots/
+demo/*/*.mp4
+demo/*/*.webm

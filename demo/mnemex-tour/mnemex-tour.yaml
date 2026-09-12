@@ -1,5 +1,5 @@
 app:
-  url: http://localhost:3000
+  url: http://localhost:3100
   viewport:
     width: 1200
     height: 1080
@@ -26,61 +26,116 @@ segments:
     narration: "An assistant forgets everything between sessions. The usual fix is to embed the transcript and search it. That works, right up until the question depends on who said what."
     intent: "hold on the landing page so the viewer reads the premise"
     timing: parallel
-    actions: []
+    actions:
+      - type: wait
+        duration: 3000
+
 
   - id: problem
     narration: "Three engineers pick Postgres. One of them argues against it. In a later session they reverse the decision. A chunk index can find all of that text and still not tell you which decision stands, or who objected."
     intent: "stay on the page while the problem is described"
     timing: parallel
-    actions: []
+    actions:
+      - type: wait
+        duration: 3000
+
 
   - id: idea
     narration: "mnemex stores the argument instead of the transcript. People, claims, decisions and reversals are all nodes and edges in a Neo4j graph."
     intent: "stay on the header, which states the same idea"
     timing: parallel
-    actions: []
+    actions:
+      - type: wait
+        duration: 2500
+
 
   - id: ask
     narration: "So we ask the question that flat retrieval cannot answer. What did we decide about the storage engine, and who disagreed?"
     intent: "type the benchmark question into the question box and submit it"
     timing: parallel
-    actions: []
+    actions:
+      - type: type
+        target: { role: textbox, name: "question" }
+        text: "what did we decide about the storage engine, and who disagreed?"
+        delay: 38
+      - type: wait
+        duration: 600
+      - type: click
+        target: { role: button, name: "recall" }
+        done: { networkIdle: true, stable: 900, timeout: 30000 }
+      - type: wait
+        duration: 1200
+
 
   - id: answer
-    narration: "The decision that still stands comes back first. Move the primary datastore to Neo4j. The Postgres decision comes back too, marked superseded."
+    narration: "Everything memory knows comes back, the decisions that still stand first. Moving the datastore to Neo4j, and it says plainly that this overrules the earlier Postgres call."
     intent: "show the two answer cards, current and superseded"
     timing: parallel
-    actions: []
+    actions:
+      - type: wait
+        duration: 3200
+
 
   - id: dissent
-    narration: "And there is the part a vector store cannot reach. Marcus is named as the dissenter, with the argument he actually made attached to his name."
+    narration: "Scroll down to the decision that lost. This is the part a vector store cannot reach. Marcus is named as the dissenter, with the argument he actually made attached to him."
     intent: "hold on the dissent block inside the superseded card"
     timing: parallel
-    actions: []
+    actions:
+      - type: scroll
+        target: { selector: "p:has-text('overruled by Move the primary datastore')" }
+      - type: wait
+        duration: 3200
+
 
   - id: graph
-    narration: "This is the memory itself. Thirteen nodes and thirty edges. The orange edge is dissent. The dashed edge is one decision superseding another."
+    narration: "This is the memory itself, every node and edge it holds, across every session. Amber marks dissent. The dashed edges are decisions that overruled an earlier one."
     intent: "switch to the memory graph tab and let the force layout settle"
     timing: parallel
-    actions: []
+    actions:
+      - type: click
+        target: { role: tab, name: "Memory graph" }
+        done: { visible: "svg[aria-label^='Force-directed']", stable: 1200, timeout: 20000 }
+      - type: wait
+        duration: 3000
+
 
   - id: inspect
-    narration: "Click the superseded decision and you get its typed connections. Who supported it, who disagreed with it, and the decision that replaced it."
+    narration: "Click the decision that was overruled, and the graph isolates it. Who supported it, who disagreed, which session it came from, and what replaced it."
     intent: "click the superseded decision node and show the inspector panel"
     timing: parallel
-    actions: []
+    actions:
+      - type: click
+        target: { selector: "[data-node='7faf7a89-ab95-4fc1-8b32-7b218a0e4aae']" }
+        done: { stable: 800, timeout: 15000 }
+      - type: wait
+        duration: 3200
+
 
   - id: history
     narration: "The timeline tells the same story in order. Postgres first, over an objection, then the reversal that overruled it."
     intent: "switch to the history tab"
     timing: parallel
-    actions: []
+    actions:
+      - type: click
+        target: { role: tab, name: "History" }
+        done: { stable: 900, timeout: 15000 }
+      - type: wait
+        duration: 3000
+
 
   - id: write
     narration: "Writing is a single tool call. A speaker, what they said, and the decision they took a position on."
     intent: "switch to the write tab and fill in a new turn"
     timing: parallel
-    actions: []
+    actions:
+      - type: scroll
+        target: { role: heading, name: "mnemex" }
+      - type: wait
+        duration: 500
+      - type: click
+        target: { role: tab, name: "Write" }
+        done: { stable: 900, timeout: 15000 }
+
 
   - id: commit
     narration: "Embedding runs on a Nosana GPU. Entity resolution runs inside a Daytona sandbox. Then the graph updates in place."
