@@ -25,6 +25,8 @@ const Schema = z.object({
   /** vLLM is started with `--served-model-name chat`, so that is the id the API expects. */
   NOSANA_CHAT_MODEL: z.string().trim().min(1).default("chat"),
   MNEMEX_UI_PORT: z.coerce.number().int().positive().max(65535).default(8787),
+  /** Loopback unless a deployment opens it. See the listen() call in index.ts. */
+  MNEMEX_UI_HOST: z.string().trim().min(1).default("127.0.0.1"),
   /** Milliseconds to wait for the model's response headers. The stream itself is unbounded. */
   MNEMEX_CHAT_CONNECT_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
 });
@@ -38,6 +40,7 @@ if (!parsed.success) {
 export const chatEndpoint = parsed.data.NOSANA_CHAT_ENDPOINT;
 export const chatModel = parsed.data.NOSANA_CHAT_MODEL;
 export const port = parsed.data.MNEMEX_UI_PORT;
+export const host = parsed.data.MNEMEX_UI_HOST;
 export const connectTimeoutMs = parsed.data.MNEMEX_CHAT_CONNECT_TIMEOUT_MS;
 
 /**

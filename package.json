@@ -13,6 +13,7 @@
     "bootstrap": "tsx scripts/bootstrap-graph.ts",
     "deploy:nosana": "tsx scripts/deploy-nosana.ts",
     "deploy:chat": "tsx scripts/deploy-chat.ts",
+    "deploy:site": "tsx scripts/deploy-daytona.ts",
     "seed": "tsx scripts/seed-demo.ts",
     "demo": "tsx scripts/demo.ts"
   },

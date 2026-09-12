@@ -1,8 +1,9 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 
-import { chatCompletionsUrl, chatEndpoint, chatModel, MISSING_ENDPOINT_MESSAGE, port, repoRoot } from "./env.js";
+import { chatCompletionsUrl, chatEndpoint, chatModel, host, MISSING_ENDPOINT_MESSAGE, port, repoRoot } from "./env.js";
 import { runTurn, type ChatMessage } from "./chat.js";
 import { TurnStream } from "./events.js";
+import { MISSING_BUILD_MESSAGE, serveStatic } from "./static.js";
 import { toolDefinitions } from "./tools.js";
 
 /**
@@ -78,8 +79,10 @@ async function handle(request: IncomingMessage, response: ServerResponse): Promi
     return;
   }
 
+  // Everything that is not the runtime seam is the frontend. Under `npm run dev` Vite owns
+  // that half and only proxies the seam here, so this branch is the deployed path.
   if (!url.startsWith(API_PREFIX)) {
-    json(response, 404, { error: "Not found" });
+    if (!(await serveStatic(request, response))) json(response, 404, { error: MISSING_BUILD_MESSAGE });
     return;
   }
 
@@ -174,10 +177,11 @@ function json(response: ServerResponse, status: number, body: unknown): void {
   response.end(payload);
 }
 
-// Loopback only. The graph credentials live in this process, and nothing about this server
-// is meant to be reachable from another machine.
-server.listen(port, "127.0.0.1", () => {
-  console.log(`[mnemex-ui] backend on http://127.0.0.1:${port}${API_PREFIX}`);
+// Loopback by default: the graph credentials live in this process, and a laptop copy has no
+// reason to be reachable from another machine. A deployment sets MNEMEX_UI_HOST=0.0.0.0,
+// because the Daytona preview proxy connects from outside the container.
+server.listen(port, host, () => {
+  console.log(`[mnemex-ui] backend on http://${host}:${port}${API_PREFIX}`);
   console.log(`[mnemex-ui] tools: ${toolDefinitions.map((tool) => tool.function.name).join(", ")}`);
   console.log(
     chatEndpoint
