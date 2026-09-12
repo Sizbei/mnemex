@@ -278,6 +278,24 @@ image allowlist which excludes text-embeddings-inference but includes
 `vllm/vllm-openai:v0.10.2`, so the deployment serves an embedding model through
 vLLM's OpenAI-compatible route.
 
+## 8a. Neo4j MCP server
+
+The official Neo4j MCP server runs alongside mnemex, pointed at the same Aura
+instance. mnemex owns the typed memory operations; the Neo4j server provides raw
+Cypher for inspection, debugging, and live demonstration of the graph.
+
+Registered as:
+
+```
+claude mcp add neo4j -- uvx mcp-neo4j-cypher@latest \
+  --db-url "$NEO4J_URI" --username "$NEO4J_USERNAME" --password "$NEO4J_PASSWORD"
+```
+
+This is a deliberate separation. Judges and developers can see that the graph is
+real and inspect it directly, without mnemex mediating what they are allowed to
+look at. It also gives a fast debugging loop during the build: when a traversal
+returns the wrong dissenter, the raw query is one tool call away.
+
 ## 9. Open decisions
 
 Deliberately deferred, with a default chosen so nothing blocks:
