@@ -1,0 +1,50 @@
+[
+  {
+    "sessionId": "a1",
+    "sessionTitle": "Auth provider selection",
+    "speaker": "Dana",
+    "topic": "auth provider",
+    "claims": ["Rolling our own session handling is three weeks we do not have."],
+    "decision": { "statement": "Adopt Auth0 for authentication", "stance": "proposes" }
+  },
+  {
+    "sessionId": "a1",
+    "sessionTitle": "Auth provider selection",
+    "speaker": "Priya",
+    "topic": "auth provider",
+    "claims": ["Auth0 pricing steps up hard at ten thousand monthly actives, and that is this quarter."],
+    "decision": { "statement": "Adopt Auth0 for authentication", "stance": "disagrees" }
+  },
+  {
+    "sessionId": "a1",
+    "sessionTitle": "Auth provider selection",
+    "speaker": "Marcus",
+    "topic": "auth provider",
+    "claims": ["The SDK is mature and the compliance paperwork is already done for us."],
+    "decision": { "statement": "Adopt Auth0 for authentication", "stance": "supports" }
+  },
+  {
+    "sessionId": "a2",
+    "sessionTitle": "Auth costs, revisited",
+    "speaker": "Priya",
+    "topic": "auth provider",
+    "claims": ["We crossed ten thousand actives in March and the invoice tripled, exactly as I warned."],
+    "decision": { "statement": "Move authentication to self-hosted Keycloak", "stance": "proposes" }
+  },
+  {
+    "sessionId": "a2",
+    "sessionTitle": "Auth costs, revisited",
+    "speaker": "Dana",
+    "topic": "auth provider",
+    "claims": ["The migration is real work, but the cost curve leaves us no choice."],
+    "decision": { "statement": "Move authentication to self-hosted Keycloak", "stance": "supports" }
+  },
+  {
+    "sessionId": "a2",
+    "sessionTitle": "Auth costs, revisited",
+    "speaker": "Marcus",
+    "topic": "auth provider",
+    "claims": ["Self-hosting means we own every CVE in the auth path, and we have no on-call for it."],
+    "decision": { "statement": "Move authentication to self-hosted Keycloak", "stance": "disagrees" }
+  }
+]

@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GraphCanvas, type RawNode, type RawLink } from "@/components/graph-canvas";
 import { WriteMemory } from "@/components/write-memory";
+import { UploadTranscript } from "@/components/upload-transcript";
 import { StatePanel, describeFailure } from "@/components/states";
 import { useDelayed } from "@/lib/use-delayed";
 
@@ -227,9 +228,14 @@ export default function Home() {
 
           <TabsContent value="write" className="mt-8 focus-visible:outline-none">
             <div className="grid gap-8 xl:grid-cols-[1fr_1.618fr]">
-              <WriteMemory
-                onWritten={() => { void loadGraph(); void ask(question, topic); }}
-              />
+              <div className="space-y-8">
+                <UploadTranscript
+                  onImported={() => { void loadGraph(); void ask(question, topic); }}
+                />
+                <WriteMemory
+                  onWritten={() => { void loadGraph(); void ask(question, topic); }}
+                />
+              </div>
               {graphPanel}
             </div>
           </TabsContent>

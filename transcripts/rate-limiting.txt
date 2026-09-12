@@ -1,0 +1,26 @@
+Standup, 12 September. Present: Priya, Marcus, Dana.
+
+Priya: Right, rate limiting. Support has had four tickets this week from people
+getting throttled on the bulk export endpoint. I think we should move the limiter
+to Redis so it is shared across all the pods.
+
+Marcus: Shared state in the request path worries me. Every single request now takes
+a network hop to Redis before it does anything useful. We measured that at about
+eight milliseconds at p99 in staging.
+
+Dana: Eight milliseconds is nothing compared to the export itself, which takes two
+seconds. I am with Priya on this one, the per-pod limiter is just wrong when we
+autoscale.
+
+Marcus: It is not the latency I mind so much as the failure mode. If Redis is down,
+does everything stop, or does everything become unlimited? Neither is good.
+
+Priya: Fail open. If Redis is unreachable we let the request through and log it.
+We would rather serve traffic than block it.
+
+Dana: Agreed. Let us go with the Redis limiter, failing open.
+
+Marcus: I still think this is the wrong call but I will not block it. Put it behind
+a flag so we can turn it off in an incident.
+
+Dana: That is fair. Flagged, fail open, Redis. Anything else? No? Done.

@@ -1,0 +1,90 @@
+[
+  {
+    "sessionId": "build-1",
+    "sessionTitle": "mnemex build session",
+    "speaker": "Claude",
+    "topic": "demo surface",
+    "claims": ["An MCP server with Claude Code as the client needs no frontend and makes the Neo4j requirement native rather than bolted on."],
+    "decision": { "statement": "Ship the demo as an MCP server with no web UI", "stance": "proposes" }
+  },
+  {
+    "sessionId": "build-1",
+    "sessionTitle": "mnemex build session",
+    "speaker": "Raymond",
+    "topic": "demo surface",
+    "claims": ["Agreed, the assistant is the client."],
+    "decision": { "statement": "Ship the demo as an MCP server with no web UI", "stance": "supports" }
+  },
+  {
+    "sessionId": "build-1",
+    "sessionTitle": "mnemex build session",
+    "speaker": "Raymond",
+    "topic": "platform integration",
+    "claims": ["Both Nosana and Daytona must be genuinely load-bearing, not checkbox integrations."],
+    "decision": { "statement": "Put both Nosana and Daytona on the critical path", "stance": "proposes" }
+  },
+  {
+    "sessionId": "build-1",
+    "sessionTitle": "mnemex build session",
+    "speaker": "Claude",
+    "topic": "platform integration",
+    "claims": ["With both platforms on the hot path, a slow GPU market or a cold sandbox can stall the live demo, so every remote call needs an automatic fallback."],
+    "decision": { "statement": "Put both Nosana and Daytona on the critical path", "stance": "disagrees" }
+  },
+  {
+    "sessionId": "build-1",
+    "sessionTitle": "mnemex build session",
+    "speaker": "Claude",
+    "topic": "ingestion approach",
+    "claims": ["Extraction quality is the most time-consuming thing to tune and it fails on stage, so the assistant should supply structure through the tool schema."],
+    "decision": { "statement": "Automatic extraction from raw transcripts is out of scope", "stance": "proposes" }
+  },
+  {
+    "sessionId": "build-1",
+    "sessionTitle": "mnemex build session",
+    "speaker": "Raymond",
+    "topic": "ingestion approach",
+    "claims": ["Take that approach for now."],
+    "decision": { "statement": "Automatic extraction from raw transcripts is out of scope", "stance": "supports" }
+  },
+  {
+    "sessionId": "build-1",
+    "sessionTitle": "mnemex build session",
+    "speaker": "Claude",
+    "topic": "supersession detection",
+    "claims": ["The two fixture decisions measure 0.75 cosine, below any safe threshold, so inferring the subject from vectors is wrong when the caller states the topic outright."],
+    "decision": { "statement": "Detect supersession from the topic edge, not embedding similarity", "stance": "proposes" }
+  },
+  {
+    "sessionId": "build-2",
+    "sessionTitle": "mnemex build session, later",
+    "speaker": "Raymond",
+    "topic": "demo surface",
+    "claims": ["The visual matters for judging, so build a web UI on AgentCanvas."],
+    "decision": { "statement": "Add a web UI built on AgentCanvas", "stance": "proposes" }
+  },
+  {
+    "sessionId": "build-2",
+    "sessionTitle": "mnemex build session, later",
+    "speaker": "Claude",
+    "topic": "demo surface",
+    "claims": ["That reverses the approved design and was costed at four to six hours after the design was locked."],
+    "decision": { "statement": "Add a web UI built on AgentCanvas", "stance": "disagrees" }
+  },
+  {
+    "sessionId": "build-2",
+    "sessionTitle": "mnemex build session, later",
+    "speaker": "Raymond",
+    "topic": "ingestion approach",
+    "claims": ["I want to upload a transcript and have it chopped up."],
+    "decision": { "statement": "Build transcript upload with review before writing", "stance": "proposes" }
+  },
+  {
+    "sessionId": "build-2",
+    "sessionTitle": "mnemex build session, later",
+    "speaker": "Claude",
+    "topic": "ingestion approach",
+    "claims": ["A tool-calling model is deployed now so it is feasible, but nothing should reach the graph before a human reviews it, because a wrong claim is worse than a missing one."],
+    "decision": { "statement": "Build transcript upload with review before writing", "stance": "supports" }
+  }
+]

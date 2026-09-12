@@ -1,0 +1,111 @@
+[
+  {
+    "speaker": "Priya",
+    "claims": [
+      "rate limiting has four tickets this week"
+    ],
+    "topic": "rate limiting",
+    "decision": {
+      "statement": "move limiter to Redis",
+      "stance": "proposes"
+    },
+    "sessionId": "t_mty1f1js",
+    "sessionTitle": "rate-limiting"
+  },
+  {
+    "speaker": "Marcus",
+    "claims": [
+      "shared state in request path worries me",
+      "network hop to Redis takes eight milliseconds at p99"
+    ],
+    "topic": "rate limiting",
+    "decision": {
+      "statement": "move limiter to Redis",
+      "stance": "disagrees"
+    },
+    "sessionId": "t_mty1f1js",
+    "sessionTitle": "rate-limiting"
+  },
+  {
+    "speaker": "Dana",
+    "claims": [
+      "per-pod limiter is wrong when autoscaling",
+      "eight milliseconds is nothing compared to export time"
+    ],
+    "topic": "rate limiting",
+    "decision": {
+      "statement": "move limiter to Redis",
+      "stance": "supports"
+    },
+    "sessionId": "t_mty1f1js",
+    "sessionTitle": "rate-limiting"
+  },
+  {
+    "speaker": "Marcus",
+    "claims": [
+      "failure mode if Redis is down is bad",
+      "everything stops or becomes unlimited"
+    ],
+    "topic": "rate limiting",
+    "decision": {
+      "statement": "move limiter to Redis",
+      "stance": "disagrees"
+    },
+    "sessionId": "t_mty1f1js",
+    "sessionTitle": "rate-limiting"
+  },
+  {
+    "speaker": "Priya",
+    "claims": [
+      "fail open if Redis is unreachable"
+    ],
+    "topic": "rate limiting",
+    "decision": {
+      "statement": "move limiter to Redis",
+      "stance": "supports"
+    },
+    "sessionId": "t_mty1f1js",
+    "sessionTitle": "rate-limiting"
+  },
+  {
+    "speaker": "Dana",
+    "claims": [
+      "agree with Priya"
+    ],
+    "topic": "rate limiting",
+    "decision": {
+      "statement": "move limiter to Redis",
+      "stance": "supports"
+    },
+    "sessionId": "t_mty1f1js",
+    "sessionTitle": "rate-limiting"
+  },
+  {
+    "speaker": "Marcus",
+    "claims": [
+      "still think wrong call but will not block it",
+      "put behind a flag"
+    ],
+    "topic": "rate limiting",
+    "decision": {
+      "statement": "move limiter to Redis",
+      "stance": "disagrees"
+    },
+    "sessionId": "t_mty1f1js",
+    "sessionTitle": "rate-limiting"
+  },
+  {
+    "speaker": "Dana",
+    "claims": [
+      "fair point",
+      "flagged, fail open, Redis"
+    ],
+    "topic": "rate limiting",
+    "decision": {
+      "statement": "move limiter to Redis",
+      "stance": "supports"
+    },
+    "sessionId": "t_mty1f1js",
+    "sessionTitle": "rate-limiting"
+  }
+]

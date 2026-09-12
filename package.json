@@ -15,7 +15,9 @@
     "deploy:chat": "tsx scripts/deploy-chat.ts",
     "deploy:site": "tsx scripts/deploy-daytona.ts",
     "seed": "tsx scripts/seed-demo.ts",
-    "demo": "tsx scripts/demo.ts"
+    "demo": "tsx scripts/demo.ts",
+    "import": "tsx scripts/import.ts",
+    "ingest": "tsx scripts/ingest.ts"
   },
   "dependencies": {
     "@daytonaio/sdk": "^0.211.2",

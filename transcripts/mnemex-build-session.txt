@@ -1,0 +1,51 @@
+Build session, 12 September. Present: Raymond, Claude.
+
+Raymond: This is a hackathon submission and the deadline is under 48 hours. Optimise
+for a working demo over completeness.
+
+Claude: Then the demo surface should be an MCP server with Claude Code as the client.
+There is no frontend to build, and it makes the Neo4j requirement native rather than
+bolted on.
+
+Raymond: Agreed, go with the MCP server and no web UI.
+
+Raymond: I want both Nosana and Daytona genuinely on the critical path, not as
+checkbox integrations.
+
+Claude: I will build that, but I want the risk on record. With both platforms on the
+hot path, a slow GPU market or a cold sandbox can stall the live demo. I am adding a
+local fallback that trips automatically so it degrades instead of dying.
+
+Raymond: Understood, both stay on the critical path.
+
+Claude: For ingestion I recommend the assistant supplying structure through the tool
+schema rather than a model extracting it from raw text. Extraction quality is the
+single most time-consuming thing to tune and it fails on stage.
+
+Raymond: Take that approach. Automatic extraction from transcripts is out of scope.
+
+Claude: Supersession detection should key off the explicit topic edge, not embedding
+similarity. I measured the two fixture decisions at 0.75 cosine, which sits below any
+safe similarity threshold, so inferring the subject from vectors was the wrong
+mechanism when the caller states the topic outright.
+
+Raymond: Do it that way.
+
+Raymond: Add a web UI using AgentCanvas. I want to see the graph and chat with it.
+
+Claude: That reverses the earlier call and it was costed at four to six hours after the
+design was locked. I will build it, but the approved design deliberately had no
+frontend.
+
+Raymond: Build it anyway, the visual matters for judging.
+
+Raymond: Skip the test suite, focus everything on the demo.
+
+Raymond: Can we upload a transcript so it can chop it up?
+
+Claude: That was an explicit non-goal in the product requirements, on the grounds that
+extraction quality eats deadlines. You now have a tool-calling model deployed, so it is
+feasible. I will build it with review before writing, because a wrong claim in memory is
+worse than a missing one.
+
+Raymond: Build the transcript upload.
