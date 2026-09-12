@@ -370,7 +370,7 @@ function DecisionCard({ decision, index }: { decision: Decision; index: number }
           {decision.statement}
         </CardTitle>
         {decision.supersedes.map((s) => (
-          <p key={s} className="text-xs text-neutral-400"><span className="text-neutral-500">overrules</span> {s}</p>
+          <p key={s} className="text-xs text-neutral-300"><span className="text-neutral-400">overrules</span> {s}</p>
         ))}
         {decision.supersededBy.map((s) => (
           <p key={s} className="text-xs text-amber-500/90"><span className="text-neutral-400">overruled by</span> {s}</p>

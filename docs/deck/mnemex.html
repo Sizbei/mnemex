@@ -362,8 +362,17 @@ pre .m{color:var(--magenta)}
 }
 @media (max-width:600px){
   :root{--title-size:clamp(1.5rem,9vw,3rem)}
-  .g-2,.g-3,.g-4{grid-template-columns:1fr}
+  /* Card grids stay two-up rather than stacking: six stacked cards cannot fit a phone viewport. */
+  .g-2{grid-template-columns:1fr}
+  .g-3,.g-4{grid-template-columns:1fr 1fr}
   .dots{display:none}
+  .kicker{display:none}
+  .card p{font-size:.68rem;line-height:1.38}
+  .card{padding:.5rem}
+  .slide[data-title="What it does"] pre{display:none}
+  /* Phone: the two verified wins and the resource strip survive; the corrections do not. */
+  .corrections{display:none}
+  .stats{gap:.6rem}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -392,7 +401,7 @@ pre .m{color:var(--magenta)}
       <g id="constellation" stroke="rgba(60,230,255,.22)" stroke-width="1" fill="none"></g>
     </svg>
   </div>
-  <div class="slide-no">01 / 10</div>
+  <div class="slide-no">01 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">Model Context Protocol · Knowledge graph memory</p>
     <div class="wordmark">
@@ -406,7 +415,7 @@ pre .m{color:var(--magenta)}
     </p>
     <div class="techstrip" data-anim="stagger" data-delay=".3">
       <span class="chip">Neo4j Aura</span>
-      <span class="chip">Nosana GPU inference</span>
+      <span class="chip">Nosana GPU · embeddings + Qwen2.5-7B</span>
       <span class="chip">Daytona sandboxes</span>
       <span class="chip">TypeScript · MCP SDK</span>
       <span class="chip">Next.js 16 demo UI</span>
@@ -422,7 +431,7 @@ pre .m{color:var(--magenta)}
     <div class="grid-bg" data-parallax="0.18"></div>
     <div class="orb mag" style="width:34vw;height:34vw;right:-8vw;top:-12vw"></div>
   </div>
-  <div class="slide-no">02 / 10</div>
+  <div class="slide-no">02 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">The problem</p>
     <h2 data-anim="up" data-delay=".08">Vector RAG remembers text.<br>It forgets <span class="c-mag">structure</span>.</h2>
@@ -462,7 +471,7 @@ pre .m{color:var(--magenta)}
     <div class="grid-bg" data-parallax="0.2"></div>
     <div class="orb vio" style="width:40vw;height:40vw;left:-10vw;bottom:-16vw"></div>
   </div>
-  <div class="slide-no">03 / 10</div>
+  <div class="slide-no">03 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">The idea</p>
     <h2 data-anim="up" data-delay=".06">Store the argument, not the transcript.</h2>
@@ -537,7 +546,7 @@ pre .m{color:var(--magenta)}
     <div class="grid-bg" data-parallax="0.16"></div>
     <div class="orb cyan" style="width:36vw;height:36vw;right:-10vw;top:-10vw"></div>
   </div>
-  <div class="slide-no">04 / 10</div>
+  <div class="slide-no">04 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">What it does</p>
     <h2 data-anim="up" data-delay=".06">Four tools over stdio. One config entry.</h2>
@@ -583,7 +592,7 @@ pre .m{color:var(--magenta)}
     <div class="grid-bg" data-parallax="0.14"></div>
     <div class="orb vio" style="width:32vw;height:32vw;left:-8vw;top:-10vw"></div>
   </div>
-  <div class="slide-no">05 / 10</div>
+  <div class="slide-no">05 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">Graph schema</p>
     <h2 data-anim="up" data-delay=".06">Five node labels. Eight kinds of edge.</h2>
@@ -631,7 +640,7 @@ pre .m{color:var(--magenta)}
     <div class="grid-bg" data-parallax="0.14"></div>
     <div class="orb mag" style="width:30vw;height:30vw;left:-8vw;bottom:-12vw"></div>
   </div>
-  <div class="slide-no">06 / 10</div>
+  <div class="slide-no">06 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">Write path</p>
     <h2 data-anim="up" data-delay=".06">Untrusted text never plans its own merge.</h2>
@@ -665,7 +674,7 @@ pre .m{color:var(--magenta)}
     <div class="grid-bg" data-parallax="0.14"></div>
     <div class="orb cyan" style="width:32vw;height:32vw;right:-9vw;bottom:-14vw"></div>
   </div>
-  <div class="slide-no">07 / 10</div>
+  <div class="slide-no">07 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">Read path</p>
     <h2 data-anim="up" data-delay=".06">The vector index finds where to start. Cypher collects the answer.</h2>
@@ -703,7 +712,7 @@ pre .m{color:var(--magenta)}
     <div class="orb vio" style="width:34vw;height:34vw;left:-10vw;top:-12vw"></div>
     <div class="orb cyan" style="width:26vw;height:26vw;right:-8vw;bottom:-10vw"></div>
   </div>
-  <div class="slide-no">08 / 10</div>
+  <div class="slide-no">08 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">Live memory</p>
     <h2 data-anim="up" data-delay=".06">Click a node, get its typed connections.</h2>
@@ -729,7 +738,7 @@ pre .m{color:var(--magenta)}
     <div class="orb mag" style="width:30vw;height:30vw;right:-8vw;top:-10vw"></div>
     <div class="orb cyan" style="width:28vw;height:28vw;left:-8vw;bottom:-12vw"></div>
   </div>
-  <div class="slide-no">09 / 10</div>
+  <div class="slide-no">09 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">Technology</p>
     <h2 data-anim="up" data-delay=".06">Four platforms, each on the critical path.</h2>
@@ -737,14 +746,19 @@ pre .m{color:var(--magenta)}
       <div class="card accent-cyan">
         <span class="tag">System of record</span>
         <h3>Neo4j Aura</h3>
-        <p>Nodes, edges and both vector indexes. Reached through the official driver with lossless integers disabled and a 10-second connection ceiling.</p>
+        <p>Nodes, edges and both vector indexes. Reached through the official driver with lossless integers disabled and a ten-second connection ceiling.</p>
       </div>
       <div class="card accent-mag">
-        <span class="tag">Inference</span>
-        <h3>Nosana</h3>
-        <p>BGE-base-en-v1.5 served on a decentralised GPU market through vLLM&rsquo;s OpenAI-compatible route. Roughly seven cents an hour.</p>
+        <span class="tag">Nosana · embeddings</span>
+        <h3>BGE-base-en-v1.5</h3>
+        <p>Served by vLLM on a decentralised GPU market over an OpenAI-compatible route. The identical checkpoint runs locally through ONNX when the endpoint is gone.</p>
       </div>
       <div class="card accent-mag">
+        <span class="tag">Nosana · reasoning</span>
+        <h3>Qwen2.5-7B-Instruct</h3>
+        <p>The assistant itself, on an A6000, with automatic tool choice and the Hermes tool-call parser. It is the thing calling mnemex, so the whole loop runs on rented GPU.</p>
+      </div>
+      <div class="card accent-lime">
         <span class="tag">Isolation</span>
         <h3>Daytona</h3>
         <p>A disposable sandbox on both paths: the merge planner on write, and assistant-authored Cypher on read, egress-limited to the database host alone.</p>
@@ -752,28 +766,77 @@ pre .m{color:var(--magenta)}
       <div class="card accent-cyan">
         <span class="tag">Transport</span>
         <h3>MCP SDK</h3>
-        <p>Three registered tools over a stdio transport, with Zod schemas doubling as the tool contract and runtime validation.</p>
+        <p>Four tools over a stdio transport. The Zod schemas are the tool contract and the runtime validation at once, so the two cannot drift apart.</p>
       </div>
       <div class="card">
-        <span class="tag">Fallback</span>
-        <h3>fastembed</h3>
-        <p>The same BGE checkpoint running locally through ONNX, so a dead GPU endpoint costs accuracy parity, not availability.</p>
-      </div>
-      <div class="card accent-lime">
-        <span class="tag">Demo surface</span>
+        <span class="tag">Demo surfaces</span>
         <h3>Next.js 16 · React 19</h3>
         <p>Route handlers import the compiled package rather than reimplementing it, so the page exercises the MCP code path. Graph drawn with d3-force.</p>
       </div>
     </div>
     <p class="kicker" data-anim="up" data-delay=".38">
-      TypeScript in strict mode throughout. Zod validates every boundary. Vitest runs the golden
-      suite end to end against a live Aura instance, not a mock.
+      TypeScript in strict mode throughout. Zod validates every boundary. The golden suite runs
+      end to end against a live Aura instance, not a mock.
     </p>
   </div>
 </section>
 
 <!-- ==========================================================
-     10 — DEGRADATION + RUN IT
+     10 — BUILD STATUS
+     ========================================================== -->
+<section class="slide" data-title="Build status">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.15"></div>
+    <div class="orb cyan" style="width:32vw;height:32vw;left:-9vw;top:-11vw"></div>
+    <div class="orb vio" style="width:28vw;height:28vw;right:-8vw;bottom:-12vw"></div>
+  </div>
+  <div class="slide-no">10 / 11</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">Build status &middot; two of five agents reported</p>
+    <h2 data-anim="up" data-delay=".06">Both landed working infrastructure, not scaffolding.</h2>
+    <div class="split" style="align-items:start">
+      <div class="stack" data-anim="stagger" data-delay=".14">
+        <div class="card accent-cyan">
+          <span class="tag">Verified &middot; tool 04</span>
+          <h3 class="c-cyan">analyze is live</h3>
+          <p>A real analytical query ran generated Cypher inside a Daytona sandbox against a read-only credential, with nothing degraded. Writes are refused in under half a second, without ever creating a sandbox. All four tools are registered.</p>
+          <p>Analyze was given its own timeout, separate from the write path: it has no fallback by design, so waiting out a slow sandbox is the only useful response, where a write should degrade in process quickly.</p>
+        </div>
+        <pre><span class="c">// stance per person — fixed traversals cannot</span>
+Priya    <span class="k">SUPPORTS</span>          2
+Marcus   <span class="m">DISAGREES_WITH</span>    1
+Dana     <span class="k">SUPPORTS</span>          1
+Marcus   <span class="k">SUPPORTS</span>          1</pre>
+      </div>
+      <div class="stack" data-anim="stagger" data-delay=".22">
+        <div class="card accent-mag">
+          <span class="tag">Verified &middot; Nosana</span>
+          <h3 class="c-mag">the chat model is live</h3>
+          <p>Qwen2.5-7B-Instruct, with tool calling verified rather than assumed. It returned a well-formed tool call for <span class="mono">recall</span> with parseable arguments, and named the dissenter correctly when the result was fed back.</p>
+        </div>
+        <div class="stack corrections">
+          <span class="tag mono" style="color:var(--dim);letter-spacing:.14em">CORRECTIONS</span>
+          <div class="rows">
+            <div class="row"><span class="k">confidential:false</span><span class="v">Necessary, not sufficient. A deployment also needs <span class="mono">autostart:true</span>, because the separate start call returns an undiagnosable 500.</span></div>
+            <div class="row"><span class="k mag">online</span><span class="v">Not a readiness signal. The field reads false while the endpoint is already serving traffic.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="stats" data-anim="stagger" data-delay=".34">
+      <div class="stat"><span class="num">4.36<span class="c-muted"> / 10</span></span><span class="lab">credits reserved</span></div>
+      <div class="stat"><span class="num c-lime">768</span><span class="lab">embed dims &middot; live</span></div>
+      <div class="stat"><span class="num c-lime">Qwen 7B</span><span class="lab">chat live &middot; tool calls</span></div>
+      <div class="stat"><span class="num">a6000</span><span class="lab">gpu market &middot; 3090s busy</span></div>
+    </div>
+    <p class="kicker" data-anim="up" data-delay=".42">
+      Three agents still running: the AgentCanvas chat UI, the graph selection bug, and the UI gap audit.
+    </p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     11 — DEGRADATION + RUN IT
      ========================================================== -->
 <section class="slide" data-title="Run it">
   <div class="field">
@@ -781,7 +844,7 @@ pre .m{color:var(--magenta)}
     <div class="orb cyan" style="width:42vw;height:42vw;left:-14vw;bottom:-18vw" data-float="1"></div>
     <div class="orb mag" style="width:34vw;height:34vw;right:-10vw;top:-12vw" data-float="2"></div>
   </div>
-  <div class="slide-no">10 / 10</div>
+  <div class="slide-no">11 / 11</div>
   <div class="slide-content">
     <p class="eyebrow" data-anim="up">Failure modes and setup</p>
     <h2 data-anim="up" data-delay=".06">Nothing remote is allowed to hang the assistant.</h2>
@@ -808,8 +871,9 @@ pre .m{color:var(--magenta)}
           <span class="to">the write throws. Memory that silently vanishes is worse than an error.</span>
         </div>
         <div class="stats" style="padding-top:.6em">
-          <div class="stat"><span class="num">3s</span><span class="lab">remote budget</span></div>
-          <div class="stat"><span class="num">15s</span><span class="lab">sandbox budget</span></div>
+          <div class="stat"><span class="num">3s</span><span class="lab">embedding budget</span></div>
+          <div class="stat"><span class="num">15s</span><span class="lab">write sandbox</span></div>
+          <div class="stat"><span class="num">30s</span><span class="lab">analyze sandbox</span></div>
           <div class="stat"><span class="num c-lime">642ms</span><span class="lab">measured recall</span></div>
         </div>
       </div>
@@ -824,7 +888,8 @@ npm run <span class="k">build</span>
 npm run <span class="k">seed</span> -- --reset
 npm run <span class="k">demo</span>
 
-<span class="c"># give an assistant durable memory</span>
+<span class="c"># deploy the model, then wire the assistant up</span>
+npm run <span class="k">deploy:chat</span>
 claude mcp add mnemex -- node <span class="s">"$(pwd)/dist/src/server.js"</span></pre>
         <p class="shot-cap" data-anim="up" data-delay=".38">Pass the environment in the MCP config: the client launches the server from an arbitrary directory.</p>
       </div>
