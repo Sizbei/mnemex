@@ -160,7 +160,7 @@ export const project = {
       "agentEdit": false,
       "agentTime": false
     },
-    "emptyState": "suggested-prompts"
+    "emptyState": "minimal"
   },
   "sidebar": {
     "newButton": true,
@@ -169,7 +169,7 @@ export const project = {
     "footer": true
   },
   "welcome": {
-    "greeting": "Meet My Agent ~"
+    "greeting": "Ask what we decided, and who disagreed."
   },
   "context": {
     "attachmentChips": true
@@ -181,7 +181,7 @@ export const project = {
     "timelineRail": true
   },
   "reasoning": {
-    "show": "thinking",
+    "show": "summary",
     "collapse": "summary-first",
     "expandable": true
   },

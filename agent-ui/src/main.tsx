@@ -9,7 +9,7 @@ import "./styles/agentmatrix.css";
 
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
-    <LocaleProvider>
+    <LocaleProvider initialLocale="en">
       <IconSetProvider>
         <IconStyleProvider value={project.theme.stylePreset === "native" ? "bold" : "line"}>
           <AgentApp />

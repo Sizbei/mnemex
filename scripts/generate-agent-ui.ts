@@ -130,10 +130,11 @@ function mnemexProject(defaultProject: Project): Project {
       preset: "warm-graphite",
       stylePreset: "native",
     },
-    conversation: {
-      ...defaultProject.conversation,
-      emptyState: "suggested-prompts",
-    },
+    // The greeting above the composer is the only welcome copy the exported shell reads.
+    welcome: { greeting: "Ask what we decided, and who disagreed." },
+    // "suggested-prompts" renders AgentCanvas's own fixed coding-agent prompts rather than
+    // the ones configured on the project, and none of them mean anything here.
+    conversation: { ...defaultProject.conversation, emptyState: "minimal" },
     composer: {
       ...defaultProject.composer,
       fileUpload: false,
@@ -144,7 +145,9 @@ function mnemexProject(defaultProject: Project): Project {
     // Watching the model call recall is the demo, so the card shows the arguments it sent
     // and the rows that came back, not a one-line summary.
     toolCalls: { detail: "full", progress: "status-icon", approval: "inline", timelineRail: true },
-    reasoning: { show: "thinking", collapse: "summary-first", expandable: true },
+    // The backend discloses what it is doing (status labels tied to real tool calls) and
+    // never invents thinking text, so "summary" is the level it can honestly fill.
+    reasoning: { show: "summary", collapse: "summary-first", expandable: true },
     git: {
       ...defaultProject.git,
       allowCommit: false,
@@ -281,9 +284,48 @@ function patchPackageJson(packageJson: Record<string, any>): Record<string, any>
   };
 }
 
+/**
+ * The product name is carried by `product.brand.displayName`, but the exported shell never
+ * reads it: the conversation header and the sidebar brand come from the i18n copy tables,
+ * which still say "Coding Agent" and "My Agent". Renamed in every locale, because a product
+ * name is not translated.
+ */
+function brandName(generated: string): string {
+  return generated
+    .replaceAll('title: "Coding Agent"', 'title: "mnemex"')
+    .replaceAll('brandName: "My Agent"', 'brandName: "mnemex"')
+    .replaceAll('brandName: "我的Agent"', 'brandName: "mnemex"');
+}
+
+/**
+ * The exported entry mounts LocaleProvider with no locale, and the provider defaults to
+ * Chinese, so an untouched export opens in Chinese whatever the project says. This product
+ * is English, so the entry says so.
+ */
+function englishLocale(generated: string): string {
+  return generated.replace("<LocaleProvider>", '<LocaleProvider initialLocale="en">');
+}
+
 const PATCHED_FILES: Record<string, (generated: string) => string> = {
   "vite.config.ts": viteConfig,
   "README.md": readme,
+  "src/main.tsx": englishLocale,
+  "src/i18n/copy/chat.ts": brandName,
+  "src/i18n/copy/workspace.ts": brandName,
+  // The turn stream arrives through the runtime seam in src/pi/piClient.ts, not through this
+  // ambient GET subscription, so the generated placeholder warning is misleading here.
+  "src/adapters/backendAdapter.ts": (generated: string) =>
+    generated.replace(
+      "export function liveEventSource(): LiveEventSource | null {",
+      [
+        "/**",
+        " * mnemex leaves this null on purpose. The scaffold has two live seams: this ambient",
+        " * GET subscription, and the per-turn stream the composer drives. A chat turn is",
+        " * request/response, so mnemex implements the second one, in agent-ui/server.",
+        " */",
+        "export function liveEventSource(): LiveEventSource | null {",
+      ].join("\n"),
+    ),
 };
 
 // ---------------------------------------------------------------------------

@@ -10,3 +10,9 @@ coverage/
 web/node_modules/
 web/.next/
 web/.env
+agent-ui/node_modules/
+# The scaffold's vendored SDKs are shipped as prebuilt dist/ folders and are linked by
+# file: specifiers, so the generated app does not install without them. The blanket dist/
+# rule above would drop them.
+!agent-ui/vendor/**/dist/
+!agent-ui/vendor/**/dist/**

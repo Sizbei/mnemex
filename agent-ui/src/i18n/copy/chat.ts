@@ -21,7 +21,7 @@ const en = {
     },
   },
   frame: {
-    title: "Coding Agent",
+    title: "mnemex",
     fallbackConversationTitle: "Mock conversation",
     subtitleSuffix: "preset preview",
   },

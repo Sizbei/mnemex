@@ -89,7 +89,7 @@ const en = {
   },
   sessionSidebar: {
     ariaLabel: "Conversation history",
-    brandName: "My Agent",
+    brandName: "mnemex",
     collapse: "Collapse sidebar",
     newSession: "New chat",
     searchPlaceholder: "Search chats",
@@ -191,7 +191,7 @@ const zh: typeof en = {
   },
   sessionSidebar: {
     ariaLabel: "会话历史",
-    brandName: "我的Agent",
+    brandName: "mnemex",
     collapse: "收起侧边栏",
     newSession: "新建对话",
     searchPlaceholder: "搜索对话",

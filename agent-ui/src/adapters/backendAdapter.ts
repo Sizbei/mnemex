@@ -117,6 +117,11 @@ export function createSseEventSource(options: SseEventSourceOptions): LiveEventS
  * source, which is why an unconfigured `transport: "sse"` export renders an empty
  * conversation instead of silently falling back to demo data.
  */
+/**
+ * mnemex leaves this null on purpose. The scaffold has two live seams: this ambient
+ * GET subscription, and the per-turn stream the composer drives. A chat turn is
+ * request/response, so mnemex implements the second one, in agent-ui/server.
+ */
 export function liveEventSource(): LiveEventSource | null {
   // return createSseEventSource({ url: "/v1/sessions/current/events/stream" });
   return null;
