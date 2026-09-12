@@ -152,11 +152,13 @@
 }
 
 /* GraphCanvas pins its svg at 560px. Below sm the fixed viewBox scales to fit
-   the narrow width, so the graph only fills the top third and the rest of the
-   box is dead space. Trim the shell to what the drawing actually uses. */
+   the narrow width, so the graph fills the top third and the rest of the box is
+   dead space. Matching the box to the viewBox aspect removes the void without
+   shrinking the drawing any further. */
 @media (max-width: 639px) {
   .graph-shell svg {
-    height: 22rem;
+    height: auto;
+    aspect-ratio: 760 / 500;
   }
 }
 
