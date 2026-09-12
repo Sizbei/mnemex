@@ -3,6 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { remember, RememberSchema } from "./tools/remember.js";
 import { recall, RecallSchema } from "./tools/recall.js";
 import { timeline, TimelineSchema } from "./tools/timeline.js";
+import { analyze, AnalyzeSchema } from "./tools/analyze.js";
 
 const server = new McpServer({ name: "mnemex", version: "0.1.0" }, { capabilities: { tools: {} } });
 
@@ -45,6 +46,19 @@ server.registerTool(
     inputSchema: TimelineSchema.shape,
   },
   async (args) => json(await timeline(args)),
+);
+
+server.registerTool(
+  "analyze",
+  {
+    title: "Analyze",
+    description:
+      "Run a read-only Cypher query against persistent memory inside an isolated sandbox. " +
+      "Use only for analytical questions that recall and timeline cannot answer, such as counting, " +
+      "grouping, or traversing relationships they do not expose. Writes are refused.",
+    inputSchema: AnalyzeSchema.shape,
+  },
+  async (args) => json(await analyze(args)),
 );
 
 const transport = new StdioServerTransport();

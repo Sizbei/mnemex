@@ -13,14 +13,18 @@ import { validatePlan, PlanValidationError } from "../planner/validate.js";
  * shipped into a sandbox, never imported.
  */
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const NORMALIZE_PATH = path.resolve(
-  HERE,
-  HERE.includes(`${path.sep}dist${path.sep}`) ? "../../../sandbox/normalize.ts" : "../../sandbox/normalize.ts",
-);
+
+/** Locate a sandbox program on disk. Shared so each caller does not re-derive the layout. */
+export function sandboxSourcePath(file: string): string {
+  const up = HERE.includes(`${path.sep}dist${path.sep}`) ? "../../../sandbox" : "../../sandbox";
+  return path.resolve(HERE, up, file);
+}
+
+const NORMALIZE_PATH = sandboxSourcePath("normalize.ts");
 
 // A fresh sandbox prints an npm update notice AFTER your stdout on its first run.
 // These suppress it. We still parse defensively: never trust the last line.
-const QUIET_NPM = { NPM_CONFIG_UPDATE_NOTIFIER: "false", NO_UPDATE_NOTIFIER: "1" };
+export const QUIET_NPM = { NPM_CONFIG_UPDATE_NOTIFIER: "false", NO_UPDATE_NOTIFIER: "1" };
 
 /** Scan backwards for the last JSON-parseable line. Trailing noise is routine here. */
 export function lastJsonLine(output: string): string {
