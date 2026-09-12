@@ -138,7 +138,6 @@
 :focus-visible {
   outline: 2px solid #d4d4d4;
   outline-offset: 2px;
-  border-radius: inherit;
 }
 
 /* Tab panels cross-fade rather than teleport when the trigger changes. */
