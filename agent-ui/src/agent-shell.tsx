@@ -33,6 +33,7 @@ import { applyTheme } from "./theme/applyTheme";
 import { themeTokens } from "./theme/themeTokens";
 import { isFixtureMode, useEventSource } from "./event-source";
 import { project } from "./exported-project";
+import { MemoryGraphPanel } from "./components/memory-graph/MemoryGraphPanel";
 import {
   abortPiRun,
   configurePiRuntime,
@@ -630,6 +631,7 @@ export function AgentApp() {
               onClose={() => setOutputModalOpen(false)}
             />
           ) : null}
+          <MemoryGraphPanel isRunning={piRunning} />
         </div>
         {previewOverlaySlots.length > 0 ? (
           <aside className="preview-overlay-surface" data-preview-region="overlay">

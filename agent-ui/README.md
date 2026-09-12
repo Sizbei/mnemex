@@ -57,6 +57,13 @@ newline-delimited AgentUX events while it runs:
 The tool definitions are generated from the zod schemas in `../src/tools/` at startup, so
 they cannot drift from what the functions actually accept.
 
+`GET /__agentcanvas/pi/memory` is the other hand-written route. It returns every node and
+edge as `{nodes, links}`, running the same Cypher as the Next.js app in `../web`, and it is
+what the memory graph panel down the right-hand side of the chat reads. The panel refetches
+when a turn ends, so a `remember` call shows up in the graph without a reload. Its canvas and
+inspector are ported from `../web` and live in `src/components/memory-graph/`, which the
+generator does not own.
+
 `NOSANA_CHAT_ENDPOINT` in the repo root `.env` points at the model. If it is unset or
 unreachable the app still loads, and the first thing on screen says so.
 

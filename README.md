@@ -253,6 +253,8 @@ What the backend does on `POST /__agentcanvas/pi/prompt`, streaming newline-deli
 
 The tool definitions are derived from the zod schemas in `src/tools/` with `z.toJSONSchema`, so they cannot drift from what the functions accept. Two deliberate omissions: `remember`'s `testRun` field is stripped, because a model that set it would quietly mark real memories as disposable, and `analyze` is not offered at all. The model gets a trimmed copy of each tool result, capped at 3000 characters with individual claim text cut at 240, because the deployment's context window is 16k and a full recall answer can fill a large part of it.
 
+Down the right-hand side of the same screen is the memory graph, so the conversation and the graph it is reading are visible at once. It is the force layout and the inspector from `web/`, ported into `agent-ui/src/components/memory-graph/`, reading `GET /__agentcanvas/pi/memory`, which runs the same Cypher as `web/src/app/api/memory/route.ts`. The panel collapses to a rail from its own header, and refetches when a turn ends, so a `remember` call changes the graph without a reload. The scaffold's artifact panel is switched off in the generator's project config: this agent produces no artifacts, and its collapsed rail button floated over the same corner.
+
 The server binds `127.0.0.1` only, on `MNEMEX_UI_PORT` (default 8787). If `NOSANA_CHAT_ENDPOINT` is unset the app still loads and says so in the first message rather than hanging.
 
 ## Configuration

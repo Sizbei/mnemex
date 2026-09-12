@@ -97,7 +97,7 @@ export const project = {
         "id": "output",
         "region": "right-panel",
         "component": "OutputFrame",
-        "enabled": true
+        "enabled": false
       },
       {
         "id": "git",

@@ -116,7 +116,10 @@ function mnemexProject(defaultProject: Project): Project {
         { id: "sessions", region: "sidebar", component: "SessionSidebar", enabled: true },
         { id: "chat", region: "main", component: "ChatFrame", enabled: true },
         { id: "composer", region: "composer", component: "ComposerFrame", enabled: true },
-        { id: "output", region: "right-panel", component: "OutputFrame", enabled: true },
+        // Off, for the same reason GitFrame is: this agent produces no artifacts, so the panel
+        // had nothing to show. It also owns the right edge — its collapsed rail button floats
+        // over whatever is there — and the memory graph is what belongs on that edge here.
+        { id: "output", region: "right-panel", component: "OutputFrame", enabled: false },
         // No repository behind this agent, so the Git panel has nothing to report.
         { id: "git", region: "right-panel", component: "GitFrame", enabled: false },
         { id: "capabilities", region: "bottom-dock", component: "CapabilityTray", enabled: false },
@@ -260,6 +263,13 @@ newline-delimited AgentUX events while it runs:
 The tool definitions are generated from the zod schemas in \`../src/tools/\` at startup, so
 they cannot drift from what the functions actually accept.
 
+\`GET ${RUNTIME_API_PREFIX}/memory\` is the other hand-written route. It returns every node and
+edge as \`{nodes, links}\`, running the same Cypher as the Next.js app in \`../web\`, and it is
+what the memory graph panel down the right-hand side of the chat reads. The panel refetches
+when a turn ends, so a \`remember\` call shows up in the graph without a reload. Its canvas and
+inspector are ported from \`../web\` and live in \`src/components/memory-graph/\`, which the
+generator does not own.
+
 \`NOSANA_CHAT_ENDPOINT\` in the repo root \`.env\` points at the model. If it is unset or
 unreachable the app still loads, and the first thing on screen says so.
 
@@ -275,6 +285,20 @@ function patchPackageJson(packageJson: Record<string, any>): Record<string, any>
   return {
     ...packageJson,
     name: "mnemex-agent-ui",
+    // The ported graph canvas (src/components/memory-graph/) is hand-written and therefore
+    // never regenerated, but the manifest that has to resolve its imports is.
+    dependencies: {
+      ...packageJson.dependencies,
+      "d3-force": "^3.0.0",
+      "d3-selection": "^3.0.0",
+      "d3-zoom": "^3.0.0",
+    },
+    devDependencies: {
+      ...packageJson.devDependencies,
+      "@types/d3-force": "^3.0.10",
+      "@types/d3-selection": "^3.0.11",
+      "@types/d3-zoom": "^3.0.8",
+    },
     scripts: {
       ...packageJson.scripts,
       // Convenience alias. The backend has to run from the repo root to resolve dist/ and
@@ -306,10 +330,35 @@ function englishLocale(generated: string): string {
   return generated.replace("<LocaleProvider>", '<LocaleProvider initialLocale="en">');
 }
 
+/**
+ * Mount the memory graph beside the conversation.
+ *
+ * The shell already has a right panel, but it belongs to the artifact surface: it is gated on
+ * `!isWelcome` and opens when someone clicks an artifact, so a graph mounted there would be
+ * missing exactly when a visitor first arrives, and mnemex produces no artifacts to open it
+ * with. Adding a slot instead would mean teaching the generated schema, the slot registry and
+ * the exported project about a component AgentCanvas does not have. `.preview-frame` is a flex
+ * row, so the panel is appended as a final column of it and manages its own collapse.
+ */
+function memoryGraphPanel(generated: string): string {
+  return generated
+    .replace(
+      'import { project } from "./exported-project";',
+      'import { project } from "./exported-project";\n' +
+        'import { MemoryGraphPanel } from "./components/memory-graph/MemoryGraphPanel";',
+    )
+    .replace(
+      "        </div>\n        {previewOverlaySlots.length > 0 ? (",
+      "          <MemoryGraphPanel isRunning={piRunning} />\n" +
+        "        </div>\n        {previewOverlaySlots.length > 0 ? (",
+    );
+}
+
 const PATCHED_FILES: Record<string, (generated: string) => string> = {
   "vite.config.ts": viteConfig,
   "README.md": readme,
   "src/main.tsx": englishLocale,
+  "src/agent-shell.tsx": memoryGraphPanel,
   "src/i18n/copy/chat.ts": brandName,
   "src/i18n/copy/workspace.ts": brandName,
   // The turn stream arrives through the runtime seam in src/pi/piClient.ts, not through this
