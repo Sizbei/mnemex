@@ -1,11 +1,22 @@
 import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Daytona, type Sandbox } from "@daytonaio/sdk";
 import { loadConfig } from "../config.js";
 import { planMerge, type MergeInput, type MergePlan } from "../planner/merge.js";
 import { validatePlan, PlanValidationError } from "../planner/validate.js";
 
-const NORMALIZE_PATH = fileURLToPath(new URL("../../sandbox/normalize.ts", import.meta.url));
+/**
+ * Resolved at runtime, not with `new URL(literal, import.meta.url)`. Bundlers
+ * statically analyse that form and fail the build when the target is not part
+ * of the module graph, which this file deliberately is not: it is source text
+ * shipped into a sandbox, never imported.
+ */
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const NORMALIZE_PATH = path.resolve(
+  HERE,
+  HERE.includes(`${path.sep}dist${path.sep}`) ? "../../../sandbox/normalize.ts" : "../../sandbox/normalize.ts",
+);
 
 // A fresh sandbox prints an npm update notice AFTER your stdout on its first run.
 // These suppress it. We still parse defensively: never trust the last line.
