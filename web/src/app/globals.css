@@ -128,3 +128,47 @@
     @apply font-sans;
   }
 }
+/*
+ * Everything below is unlayered on purpose: unlayered rules beat Tailwind's
+ * @layer utilities, which is what lets the two overrides here win.
+ */
+
+/* Focus has to be visible on the plain <button>s too, not only on the shadcn
+   ones that carry their own ring. neutral-300 on neutral-950 is about 10:1. */
+:focus-visible {
+  outline: 2px solid #d4d4d4;
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* Tab panels cross-fade rather than teleport when the trigger changes. */
+[data-slot="tabs-content"][data-state="active"] {
+  animation: mnemex-fade-in 200ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes mnemex-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* GraphCanvas pins its svg at 560px. Below sm the fixed viewBox scales to fit
+   the narrow width, so the graph only fills the top third and the rest of the
+   box is dead space. Trim the shell to what the drawing actually uses. */
+@media (max-width: 639px) {
+  .graph-shell svg {
+    height: 22rem;
+  }
+}
+
+/* Reduced motion means gentler, not none: the fades still explain what changed,
+   so only the movement and the hover scaling go. */
+@media (prefers-reduced-motion: reduce) {
+  [class*="slide-in-from-"] {
+    --tw-enter-translate-x: 0 !important;
+    --tw-enter-translate-y: 0 !important;
+  }
+  [class*="hover:scale-"]:hover,
+  [class*="active:scale-"]:active {
+    transform: none !important;
+  }
+}
