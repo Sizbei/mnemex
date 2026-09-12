@@ -1,0 +1,151 @@
+1
+00:00:02,798 --> 00:00:05,992
+An assistant forgets everything between sessions.
+
+2
+00:00:05,992 --> 00:00:09,577
+The usual fix is to embed the transcript and search it.
+
+3
+00:00:09,577 --> 00:00:13,814
+That works, right up until the question depends on who said what.
+
+4
+00:00:13,816 --> 00:00:15,800
+Three engineers pick Postgres.
+
+5
+00:00:15,800 --> 00:00:17,785
+One of them argues against it.
+
+6
+00:00:17,785 --> 00:00:20,761
+In a later session they reverse the decision.
+
+7
+00:00:20,761 --> 00:00:26,318
+A chunk index can find all of that text and still not tell you which decision stands
+
+8
+00:00:26,318 --> 00:00:27,376
+or who objected.
+
+9
+00:00:27,379 --> 00:00:31,465
+mnemex stores the argument instead of the transcript.
+
+10
+00:00:31,465 --> 00:00:32,544
+People, claims
+
+11
+00:00:32,544 --> 00:00:37,555
+decisions and reversals are all nodes and edges in a Neo4j graph.
+
+12
+00:00:37,558 --> 00:00:40,875
+So we ask the question that flat retrieval cannot answer.
+
+13
+00:00:40,875 --> 00:00:44,542
+What did we decide about the storage engine, and who disagreed?
+
+14
+00:00:44,543 --> 00:00:49,893
+Everything memory knows comes back, the decisions that still stand first.
+
+15
+00:00:49,893 --> 00:00:52,018
+Moving the datastore to Neo4j
+
+16
+00:00:52,018 --> 00:00:56,855
+and it says plainly that this overrules the earlier Postgres call.
+
+17
+00:00:56,857 --> 00:00:59,406
+Scroll down to the decision that lost.
+
+18
+00:00:59,406 --> 00:01:02,425
+This is the part a vector store cannot reach.
+
+19
+00:01:02,425 --> 00:01:04,572
+Marcus is named as the dissenter
+
+20
+00:01:04,572 --> 00:01:07,993
+with the argument he actually made attached to him.
+
+21
+00:01:07,994 --> 00:01:10,909
+The timeline tells the same story in order.
+
+22
+00:01:10,909 --> 00:01:15,722
+Postgres first, over an objection, then the reversal that overruled it.
+
+23
+00:01:15,725 --> 00:01:17,650
+Writing is a single tool call.
+
+24
+00:01:17,650 --> 00:01:22,013
+A speaker, what they said, and the decision they took a position on.
+
+25
+00:01:25,958 --> 00:01:28,565
+Embedding runs on a Nosana GPU.
+
+26
+00:01:28,565 --> 00:01:32,603
+Entity resolution runs inside a Daytona sandbox.
+
+27
+00:01:32,603 --> 00:01:35,294
+Then the graph updates in place.
+
+28
+00:01:35,295 --> 00:01:41,264
+This is the memory itself, every node and edge it holds, across every session.
+
+29
+00:01:41,264 --> 00:01:42,795
+Amber marks dissent.
+
+30
+00:01:42,795 --> 00:01:47,463
+The dashed edges are decisions that overruled an earlier one.
+
+31
+00:01:47,465 --> 00:01:52,123
+Click the decision that was overruled, and the graph isolates it.
+
+32
+00:01:52,123 --> 00:01:56,352
+Who supported it, who disagreed, which session it came from
+
+33
+00:01:56,352 --> 00:01:57,857
+and what replaced it.
+
+34
+00:01:57,859 --> 00:02:01,125
+Four tools over the Model Context Protocol.
+
+35
+00:02:01,125 --> 00:02:04,314
+Any assistant that speaks MCP gets durable
+
+36
+00:02:04,314 --> 00:02:08,491
+relationship aware memory from one entry in its config.
+
+37
+00:02:08,493 --> 00:02:12,786
+Ask what was decided, and get back what still stands, and who fought it.
+
+38
+00:02:12,786 --> 00:02:14,157
+That is the whole idea.

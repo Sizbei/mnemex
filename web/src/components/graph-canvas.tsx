@@ -6,6 +6,8 @@ import {
   type Simulation, type SimulationNodeDatum, type SimulationLinkDatum,
 } from "d3-force";
 import { select } from "d3-selection";
+// Imported for its side effect: it augments d3-selection with .transition().
+import "d3-transition";
 import { zoom as d3zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from "d3-zoom";
 
 export interface RawNode { id: string; label: string; title: string; status: string | null }
@@ -80,8 +82,14 @@ export function GraphCanvas({
       .alphaDecay(0.06)
       .velocityDecay(0.45);
     sim.on("tick", () => setTick((t) => t + 1));
+    sim.on("end", () => fitRef.current());
     simRef.current = sim;
-    return () => void sim.stop();
+    // alphaDecay lets "end" arrive late on a large graph; fit anyway once it has settled enough to look right.
+    const settled = setTimeout(() => fitRef.current(), 2800);
+    return () => {
+      clearTimeout(settled);
+      sim.stop();
+    };
   }, [nodes, links]);
 
   /**
@@ -160,11 +168,40 @@ export function GraphCanvas({
     simRef.current?.alphaTarget(0);
   };
 
+  /**
+   * Zoom and centre so the whole graph sits inside the viewBox. The simulation
+   * spreads further as memory grows, and the viewBox is fixed, so past roughly
+   * forty nodes the outer ring lands outside the frame: clipped visually, and
+   * unclickable. Fitting once the layout settles keeps the graph whole at any size.
+   */
+  const fitView = useCallback(() => {
+    const svg = svgRef.current;
+    const z = zoomRef.current;
+    if (!svg || !z || nodes.length === 0) return;
+    const xs = nodes.map((n) => n.x ?? 0);
+    const ys = nodes.map((n) => n.y ?? 0);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const vb = svg.viewBox.baseVal;
+    const pad = 70;
+    const k = Math.min(3, Math.max(0.3, Math.min(
+      vb.width / Math.max(1, maxX - minX + pad * 2),
+      vb.height / Math.max(1, maxY - minY + pad * 2),
+    )));
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    select(svg).call(z.transform, zoomIdentity.translate(-cx * k, -cy * k).scale(k));
+  }, [nodes]);
+
+  const fitRef = useRef<() => void>(fitView);
+  fitRef.current = fitView;
+
   const resetView = () => {
     if (!svgRef.current || !zoomRef.current) return;
     select(svgRef.current).transition().duration(400).call(zoomRef.current.transform, zoomIdentity);
     for (const n of nodes) { n.fx = null; n.fy = null; }
     simRef.current?.alpha(0.8).restart();
+    setTimeout(() => fitRef.current(), 2800);
   };
 
   const dim = (id: string) => neighbours !== null && !neighbours.has(id);

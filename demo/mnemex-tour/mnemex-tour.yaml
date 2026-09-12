@@ -1,156 +1,214 @@
+titleCard:
+  title: "mnemex"
+  subtitle: "Graph memory for AI assistants"
+  duration: 2500
 app:
-  url: http://localhost:3100
+  url: "http://localhost:3100"
   viewport:
     width: 1200
     height: 1080
   scale: 2
   zoom: 1
-  colorScheme: dark
-
-titleCard:
-  title: "mnemex"
-  subtitle: "Graph memory for AI assistants"
-  duration: 2500
-
+  colorScheme: "dark"
 tts:
   provider: "edge"
   voice: "en-US-AndrewMultilingualNeural"
   speed: 1
-
 recording:
   outputDir: "."
   fps: 30
-
 segments:
-  - id: hook
+  - id: "hook"
     narration: "An assistant forgets everything between sessions. The usual fix is to embed the transcript and search it. That works, right up until the question depends on who said what."
     intent: "hold on the landing page so the viewer reads the premise"
-    timing: parallel
     actions:
-      - type: wait
+      - type: "wait"
         duration: 3000
-
-
-  - id: problem
+    timing: "parallel"
+    audioDuration: 11016
+    videoDuration: 11018
+  - id: "problem"
     narration: "Three engineers pick Postgres. One of them argues against it. In a later session they reverse the decision. A chunk index can find all of that text and still not tell you which decision stands, or who objected."
     intent: "stay on the page while the problem is described"
-    timing: parallel
     actions:
-      - type: wait
+      - type: "wait"
         duration: 3000
-
-
-  - id: idea
+    timing: "parallel"
+    audioDuration: 13560
+    videoDuration: 13563
+  - id: "idea"
     narration: "mnemex stores the argument instead of the transcript. People, claims, decisions and reversals are all nodes and edges in a Neo4j graph."
     intent: "stay on the header, which states the same idea"
-    timing: parallel
     actions:
-      - type: wait
+      - type: "wait"
         duration: 2500
-
-
-  - id: ask
+    timing: "parallel"
+    audioDuration: 10176
+    videoDuration: 10179
+  - id: "ask"
     narration: "So we ask the question that flat retrieval cannot answer. What did we decide about the storage engine, and who disagreed?"
     intent: "type the benchmark question into the question box and submit it"
-    timing: parallel
     actions:
-      - type: type
-        target: { role: textbox, name: "question" }
+      - type: "type"
+        target:
+          role: "textbox"
+          name: "question"
         text: "what did we decide about the storage engine, and who disagreed?"
         delay: 38
-      - type: wait
+      - type: "wait"
         duration: 600
-      - type: click
-        target: { role: button, name: "recall" }
-        done: { networkIdle: true, stable: 900, timeout: 30000 }
-      - type: wait
+      - type: "click"
+        target:
+          role: "button"
+          name: "recall"
+        done:
+          networkIdle: true
+          stable: 900
+          timeout: 30000
+      - type: "wait"
         duration: 1200
-
-
-  - id: answer
+    timing: "parallel"
+    audioDuration: 6984
+    videoDuration: 6985
+  - id: "answer"
     narration: "Everything memory knows comes back, the decisions that still stand first. Moving the datastore to Neo4j, and it says plainly that this overrules the earlier Postgres call."
     intent: "show the two answer cards, current and superseded"
-    timing: parallel
     actions:
-      - type: wait
+      - type: "wait"
         duration: 3200
-
-
-  - id: dissent
+    timing: "parallel"
+    audioDuration: 12312
+    videoDuration: 12314
+  - id: "dissent"
     narration: "Scroll down to the decision that lost. This is the part a vector store cannot reach. Marcus is named as the dissenter, with the argument he actually made attached to him."
     intent: "hold on the dissent block inside the superseded card"
-    timing: parallel
     actions:
-      - type: scroll
-        target: { selector: "p:has-text('overruled by Move the primary datastore')" }
-      - type: wait
+      - type: "scroll"
+        target:
+          selector: "p:has-text('overruled by Move the primary datastore')"
+      - type: "wait"
         duration: 3200
-
-
-  - id: graph
-    narration: "This is the memory itself, every node and edge it holds, across every session. Amber marks dissent. The dashed edges are decisions that overruled an earlier one."
-    intent: "switch to the memory graph tab and let the force layout settle"
-    timing: parallel
-    actions:
-      - type: click
-        target: { role: tab, name: "Memory graph" }
-        done: { visible: "svg[aria-label^='Force-directed']", stable: 1200, timeout: 20000 }
-      - type: wait
-        duration: 3000
-
-
-  - id: inspect
-    narration: "Click the decision that was overruled, and the graph isolates it. Who supported it, who disagreed, which session it came from, and what replaced it."
-    intent: "click the superseded decision node and show the inspector panel"
-    timing: parallel
-    actions:
-      - type: click
-        target: { selector: "[data-node='7faf7a89-ab95-4fc1-8b32-7b218a0e4aae']" }
-        done: { stable: 800, timeout: 15000 }
-      - type: wait
-        duration: 3200
-
-
-  - id: history
+    timing: "parallel"
+    audioDuration: 11136
+    videoDuration: 11137
+  - id: "history"
     narration: "The timeline tells the same story in order. Postgres first, over an objection, then the reversal that overruled it."
     intent: "switch to the history tab"
-    timing: parallel
     actions:
-      - type: click
-        target: { role: tab, name: "History" }
-        done: { stable: 900, timeout: 15000 }
-      - type: wait
+      - type: "click"
+        target:
+          role: "tab"
+          name: "History"
+        done:
+          stable: 900
+          timeout: 15000
+      - type: "wait"
         duration: 3000
-
-
-  - id: write
+    timing: "parallel"
+    audioDuration: 7728
+    videoDuration: 7731
+  - id: "write"
     narration: "Writing is a single tool call. A speaker, what they said, and the decision they took a position on."
     intent: "switch to the write tab and fill in a new turn"
-    timing: parallel
     actions:
-      - type: scroll
-        target: { role: heading, name: "mnemex" }
-      - type: wait
+      - type: "scroll"
+        target:
+          role: "heading"
+          name: "mnemex"
+      - type: "wait"
         duration: 500
-      - type: click
-        target: { role: tab, name: "Write" }
-        done: { stable: 900, timeout: 15000 }
-
-
-  - id: commit
+      - type: "click"
+        target:
+          role: "tab"
+          name: "Write"
+        done:
+          stable: 900
+          timeout: 15000
+      - type: "wait"
+        duration: 900
+      - type: "type"
+        target:
+          role: "textbox"
+          name: "what they said"
+        text: "Neo4j is the wrong call, our write volume will outgrow it."
+        delay: 34
+      - type: "wait"
+        duration: 500
+      - type: "type"
+        target:
+          role: "textbox"
+          name: "decision they took a position on (optional)"
+        text: "Move the primary datastore back to Postgres"
+        delay: 34
+      - type: "wait"
+        duration: 1200
+    timing: "parallel"
+    audioDuration: 6288
+    videoDuration: 10233
+  - id: "commit"
     narration: "Embedding runs on a Nosana GPU. Entity resolution runs inside a Daytona sandbox. Then the graph updates in place."
     intent: "submit the new memory and watch the graph redraw"
-    timing: parallel
-    actions: []
-
-  - id: stack
+    actions:
+      - type: "click"
+        target:
+          role: "button"
+          name: "remember"
+        done:
+          networkIdle: true
+          stable: 1500
+          timeout: 60000
+      - type: "wait"
+        duration: 2500
+    timing: "parallel"
+    audioDuration: 9336
+    videoDuration: 9337
+  - id: "graph"
+    narration: "This is the memory itself, every node and edge it holds, across every session. Amber marks dissent. The dashed edges are decisions that overruled an earlier one."
+    intent: "switch to the memory graph tab and let the force layout settle"
+    actions:
+      - type: "click"
+        target:
+          role: "tab"
+          name: "Memory graph"
+        done:
+          visible: "svg[aria-label^='Force-directed']"
+          stable: 1200
+          timeout: 20000
+      - type: "wait"
+        duration: 3000
+    timing: "parallel"
+    audioDuration: 12168
+    videoDuration: 12170
+  - id: "inspect"
+    narration: "Click the decision that was overruled, and the graph isolates it. Who supported it, who disagreed, which session it came from, and what replaced it."
+    intent: "click the superseded decision node and show the inspector panel"
+    actions:
+      - type: "click"
+        target:
+          selector: "[data-node='7faf7a89-ab95-4fc1-8b32-7b218a0e4aae']"
+        done:
+          stable: 800
+          timeout: 15000
+      - type: "wait"
+        duration: 3200
+    timing: "parallel"
+    audioDuration: 10392
+    videoDuration: 10394
+  - id: "stack"
     narration: "Four tools over the Model Context Protocol. Any assistant that speaks MCP gets durable, relationship aware memory from one entry in its config."
     intent: "hold on the updated graph"
-    timing: parallel
-    actions: []
-
-  - id: close
+    actions:
+      - type: "wait"
+        duration: 3000
+    timing: "parallel"
+    audioDuration: 10632
+    videoDuration: 10634
+  - id: "close"
     narration: "Ask what was decided, and get back what still stands, and who fought it. That is the whole idea."
     intent: "return to the answer tab for the closing frame"
-    timing: parallel
-    actions: []
+    actions:
+      - type: "wait"
+        duration: 3500
+    timing: "parallel"
+    audioDuration: 5664
+    videoDuration: 5666

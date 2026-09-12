@@ -70,9 +70,15 @@ function completionsUrl(endpoint: string): string {
  * skipped rather than aborting the whole transcript, and within a batch each turn is
  * validated on its own so one malformed element does not lose its neighbours.
  */
+export interface ExtractOptions {
+  endpoint: string;
+  model?: string;
+  signal?: AbortSignal;
+}
+
 export async function extractTurns(
   transcript: string,
-  options: { endpoint: string; model?: string; signal?: AbortSignal } = { endpoint: "" },
+  options: ExtractOptions,
 ): Promise<ExtractResult> {
   if (!options.endpoint) throw new Error("No chat endpoint configured for extraction.");
 

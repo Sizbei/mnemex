@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { remember } from "../../../../../dist/src/tools/remember.js";
+import { remember, type RememberInput } from "../../../../../dist/src/tools/remember.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -7,7 +7,7 @@ export const maxDuration = 300;
 /** Writes turns the user has already seen and approved. */
 export async function POST(request: Request) {
   const { turns, sessionTitle } = (await request.json()) as {
-    turns?: Record<string, unknown>[];
+    turns?: Omit<RememberInput, "sessionId" | "sessionTitle" | "testRun">[];
     sessionTitle?: string;
   };
   if (!turns?.length) {
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   try {
     for (const turn of turns) {
       const result = await remember({
-        ...(turn as never),
+        ...turn,
         sessionId,
         sessionTitle: sessionTitle || "Uploaded transcript",
         testRun: "demo",
