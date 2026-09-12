@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mnemex — graph memory for AI assistants</title>
+
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   NEON CYBER — mnemex deck
+   Palette, type scale and motion tokens all live here.
+   ============================================================ */
+:root{
+  --bg:#05070f;
+  --bg-2:#080d1c;
+  --panel:rgba(15,23,44,.62);
+  --line:rgba(120,160,220,.16);
+  --line-2:rgba(120,160,220,.30);
+  --ink:#e9f1ff;
+  --muted:#8aa0c6;
+  --dim:#5f7398;
+  --cyan:#3ce6ff;
+  --magenta:#ff3ea5;
+  --violet:#8b6cff;
+  --lime:#5ef2b5;
+  --amber:#ffb245;
+
+  --title-size:clamp(1.9rem,6.4vw,5.4rem);
+  --h2-size:clamp(1.35rem,3.3vw,2.7rem);
+  --h3-size:clamp(.95rem,1.6vw,1.32rem);
+  --body-size:clamp(.78rem,1.02vw,1.02rem);
+  --small-size:clamp(.62rem,.78vw,.8rem);
+  --mono-size:clamp(.62rem,.82vw,.86rem);
+
+  --slide-padding:clamp(1.1rem,4.2vw,4.6rem);
+  --content-gap:clamp(.6rem,1.9vh,1.9rem);
+  --element-gap:clamp(.3rem,1vh,1rem);
+
+  --sans:'Satoshi','Avenir Next',system-ui,-apple-system,sans-serif;
+  --display:'Clash Display','Satoshi',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{height:100%;overflow-x:hidden}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:var(--body-size);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- slide frame: exactly one viewport, never scrolls ---------- */
+.slide{
+  width:100vw;
+  height:100vh;
+  height:100dvh;
+  overflow:hidden;
+  scroll-snap-align:start;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  isolation:isolate;
+}
+.slide-content{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  max-height:100%;
+  overflow:hidden;
+  padding:var(--slide-padding);
+  gap:var(--content-gap);
+  position:relative;
+  z-index:2;
+}
+
+/* ---------- atmosphere: grid, glow, scanline ---------- */
+.field{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.grid-bg{
+  position:absolute;inset:-20%;
+  background-image:
+    linear-gradient(rgba(120,170,255,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(120,170,255,.055) 1px,transparent 1px);
+  background-size:clamp(38px,4vw,72px) clamp(38px,4vw,72px);
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 45%,#000 20%,transparent 78%);
+}
+.orb{
+  position:absolute;border-radius:50%;
+  filter:blur(clamp(40px,7vw,110px));
+  opacity:.5;
+}
+.orb.cyan{background:radial-gradient(circle,#0ea5c4,transparent 68%)}
+.orb.mag{background:radial-gradient(circle,#b8246c,transparent 68%)}
+.orb.vio{background:radial-gradient(circle,#5b3fd6,transparent 68%)}
+
+/* ---------- type ---------- */
+.eyebrow{
+  font-family:var(--mono);
+  font-size:var(--small-size);
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--cyan);
+  display:flex;align-items:center;gap:.7em;
+}
+.eyebrow::before{
+  content:"";width:clamp(18px,2.4vw,40px);height:1px;
+  background:linear-gradient(90deg,var(--cyan),transparent);
+}
+h1{
+  font-family:var(--display);
+  font-size:var(--title-size);
+  font-weight:600;
+  line-height:.92;
+  letter-spacing:-.03em;
+}
+h2{
+  font-family:var(--display);
+  font-size:var(--h2-size);
+  font-weight:600;
+  line-height:1.08;
+  letter-spacing:-.02em;
+  max-width:22ch;
+}
+h3{
+  font-family:var(--display);
+  font-size:var(--h3-size);
+  font-weight:600;
+  letter-spacing:-.01em;
+}
+.lede{
+  font-size:clamp(.85rem,1.28vw,1.22rem);
+  color:var(--muted);
+  max-width:56ch;
+  line-height:1.6;
+}
+.kicker{
+  font-size:var(--body-size);
+  color:var(--dim);
+  max-width:74ch;
+  border-left:2px solid var(--line-2);
+  padding-left:clamp(.6rem,1.1vw,1.1rem);
+}
+.mono{font-family:var(--mono);font-size:var(--mono-size)}
+.c-cyan{color:var(--cyan)} .c-mag{color:var(--magenta)}
+.c-lime{color:var(--lime)} .c-amber{color:var(--amber)}
+.c-vio{color:var(--violet)} .c-muted{color:var(--muted)}
+
+/* ---------- slide numbering ---------- */
+.slide-no{
+  position:absolute;
+  top:clamp(.8rem,2.2vh,2rem);
+  right:clamp(.9rem,2.6vw,3rem);
+  font-family:var(--mono);
+  font-size:var(--small-size);
+  color:var(--dim);
+  letter-spacing:.16em;
+  z-index:3;
+}
+
+/* ---------- cards / grids ---------- */
+.grid{display:grid;gap:clamp(.5rem,1.2vw,1.1rem)}
+.g-2{grid-template-columns:repeat(2,1fr)}
+.g-3{grid-template-columns:repeat(3,1fr)}
+.g-4{grid-template-columns:repeat(4,1fr)}
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:clamp(8px,.8vw,16px);
+  padding:clamp(.65rem,1.3vw,1.35rem);
+  display:flex;flex-direction:column;gap:.45em;
+  position:relative;overflow:hidden;
+  backdrop-filter:blur(6px);
+}
+.card::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(160deg,rgba(60,230,255,.09),transparent 46%);
+  pointer-events:none;
+}
+.card p{font-size:var(--body-size);color:var(--muted);line-height:1.5}
+.card .tag{
+  font-family:var(--mono);font-size:var(--small-size);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+}
+.card.accent-cyan{border-color:rgba(60,230,255,.34)}
+.card.accent-mag{border-color:rgba(255,62,165,.34)}
+.card.accent-lime{border-color:rgba(94,242,181,.32)}
+
+/* ---------- split layouts ---------- */
+.split{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);
+  gap:clamp(.9rem,2.4vw,2.6rem);
+  align-items:center;
+  min-height:0;
+}
+.split.narrow-right{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.stack{display:flex;flex-direction:column;gap:var(--element-gap);min-height:0}
+
+/* ---------- screenshots ---------- */
+.shot{
+  border:1px solid var(--line-2);
+  border-radius:clamp(8px,.8vw,14px);
+  overflow:hidden;
+  background:#04060d;
+  box-shadow:0 clamp(10px,2vh,30px) clamp(24px,5vh,70px) rgba(0,0,0,.6),
+             0 0 0 1px rgba(60,230,255,.07);
+  position:relative;
+}
+.shot img{display:block;width:100%;height:auto;max-height:min(58vh,560px);object-fit:cover;object-position:top center}
+.shot.tall img{max-height:min(66vh,660px)}
+.shot-cap{
+  font-family:var(--mono);font-size:var(--small-size);
+  color:var(--dim);letter-spacing:.1em;text-transform:uppercase;
+  padding-top:.5em;
+}
+
+/* ---------- pipeline ---------- */
+.pipe{display:flex;flex-direction:column;gap:clamp(.35rem,.9vh,.75rem)}
+.step{
+  display:grid;grid-template-columns:auto 1fr;gap:clamp(.55rem,1.1vw,1rem);
+  align-items:baseline;
+  padding:clamp(.42rem,.95vh,.8rem) clamp(.6rem,1.1vw,1rem);
+  border:1px solid var(--line);
+  border-left:2px solid var(--cyan);
+  border-radius:clamp(6px,.6vw,10px);
+  background:rgba(12,20,40,.5);
+}
+.step .n{font-family:var(--mono);font-size:var(--small-size);color:var(--cyan)}
+.step .t{font-size:var(--body-size)}
+.step .t b{font-weight:600;color:var(--ink)}
+.step .t span{color:var(--muted)}
+.step.sandbox{border-left-color:var(--magenta)} .step.sandbox .n{color:var(--magenta)}
+.step.commit{border-left-color:var(--lime)} .step.commit .n{color:var(--lime)}
+
+/* ---------- schema tables ---------- */
+.rows{display:flex;flex-direction:column;gap:clamp(.18rem,.5vh,.42rem)}
+.row{
+  display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);
+  gap:clamp(.5rem,1.1vw,1rem);align-items:baseline;
+  padding-bottom:clamp(.18rem,.45vh,.4rem);
+  border-bottom:1px solid rgba(120,160,220,.09);
+}
+.row .k{font-family:var(--mono);font-size:var(--mono-size);color:var(--cyan);white-space:nowrap}
+.row .k.mag{color:var(--magenta)}
+.row .v{font-size:var(--small-size);color:var(--muted);line-height:1.4}
+
+/* ---------- code ---------- */
+pre{
+  font-family:var(--mono);font-size:var(--mono-size);
+  background:rgba(6,10,22,.85);
+  border:1px solid var(--line);
+  border-radius:clamp(6px,.6vw,12px);
+  padding:clamp(.6rem,1.1vw,1.1rem);
+  overflow:hidden;line-height:1.65;color:var(--muted);
+}
+pre .k{color:var(--cyan)} pre .s{color:var(--lime)} pre .c{color:var(--dim)}
+pre .m{color:var(--magenta)}
+
+/* ---------- stat strip ---------- */
+.stats{display:flex;flex-wrap:wrap;gap:clamp(.6rem,1.8vw,2.2rem)}
+.stat{display:flex;flex-direction:column;gap:.1em}
+.stat .num{
+  font-family:var(--display);font-weight:600;
+  font-size:clamp(1.1rem,2.5vw,2.1rem);line-height:1;
+  color:var(--ink);
+}
+.stat .lab{
+  font-family:var(--mono);font-size:var(--small-size);
+  color:var(--dim);letter-spacing:.13em;text-transform:uppercase;
+}
+
+/* ---------- inline graph diagram (slide 3) ---------- */
+.diagram{width:100%;height:auto;max-height:min(52vh,470px);overflow:visible}
+.node-lab{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.node-lab.strong{fill:var(--ink);font-family:var(--sans);font-size:12.5px;font-weight:600}
+.edge-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em}
+
+/* ---------- title slide extras ---------- */
+.wordmark{display:flex;align-items:baseline;gap:clamp(.5rem,1.6vw,1.4rem);flex-wrap:wrap}
+.chip{
+  font-family:var(--mono);font-size:var(--small-size);
+  border:1px solid var(--line-2);border-radius:999px;
+  padding:.35em 1em;color:var(--muted);
+  white-space:nowrap;
+}
+.techstrip{display:flex;flex-wrap:wrap;gap:clamp(.35rem,.9vw,.7rem)}
+
+/* ---------- degradation rows ---------- */
+.deg{
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.15fr);
+  align-items:center;gap:clamp(.5rem,1.2vw,1.1rem);
+  padding:clamp(.45rem,1vh,.85rem) 0;
+  border-bottom:1px solid rgba(120,160,220,.1);
+}
+.deg .from{font-family:var(--mono);font-size:var(--mono-size);color:var(--ink)}
+.deg .arrow{color:var(--amber);font-family:var(--mono)}
+.deg .to{font-size:var(--small-size);color:var(--muted)}
+.deg.fatal .arrow{color:var(--magenta)}
+
+/* ---------- nav chrome ---------- */
+.progress{
+  position:fixed;top:0;left:0;height:2px;width:0;
+  background:linear-gradient(90deg,var(--cyan),var(--magenta));
+  z-index:100;transition:width .25s ease;
+}
+.dots{
+  position:fixed;right:clamp(.5rem,1.2vw,1.3rem);top:50%;
+  transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:.55rem;z-index:100;
+}
+.dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(140,175,225,.26);border:0;padding:0;cursor:pointer;
+  transition:background .2s,transform .2s;
+}
+.dot[aria-current="true"]{background:var(--cyan);transform:scale(1.6)}
+.hint{
+  position:fixed;left:clamp(.7rem,1.6vw,1.8rem);bottom:clamp(.6rem,1.5vh,1.4rem);
+  font-family:var(--mono);font-size:var(--small-size);color:var(--dim);
+  z-index:100;opacity:.75;
+}
+
+/* ---------- short / small screens ---------- */
+@media (max-height:700px){
+  :root{
+    --slide-padding:clamp(.75rem,3vw,2rem);
+    --content-gap:clamp(.4rem,1.4vh,1rem);
+    --title-size:clamp(1.5rem,5vw,3.2rem);
+    --h2-size:clamp(1.1rem,2.9vw,1.9rem);
+  }
+  .shot img{max-height:min(46vh,380px)}
+}
+@media (max-height:600px){
+  :root{
+    --slide-padding:clamp(.5rem,2.4vw,1.4rem);
+    --content-gap:clamp(.3rem,1vh,.7rem);
+    --title-size:clamp(1.2rem,4vw,2.2rem);
+    --body-size:clamp(.7rem,1vw,.9rem);
+  }
+  .dots,.hint{display:none}
+  .shot img{max-height:min(40vh,300px)}
+}
+@media (max-height:500px){
+  :root{--title-size:clamp(1rem,3.5vw,1.6rem);--h2-size:clamp(.9rem,2.4vw,1.2rem)}
+  .kicker{display:none}
+}
+@media (max-width:820px){
+  .split,.split.narrow-right{grid-template-columns:1fr}
+  .g-3,.g-4{grid-template-columns:1fr 1fr}
+  .shot img{max-height:min(34vh,280px)}
+}
+@media (max-width:600px){
+  :root{--title-size:clamp(1.5rem,9vw,3rem)}
+  .g-2,.g-3,.g-4{grid-template-columns:1fr}
+  .dots{display:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.2s !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<nav class="dots" id="dots" aria-label="Slide navigation"></nav>
+<div class="hint">← → / scroll / swipe</div>
+
+<main>
+
+<!-- ==========================================================
+     1 — TITLE
+     ========================================================== -->
+<section class="slide" data-title="Title">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.25"></div>
+    <div class="orb cyan" style="width:46vw;height:46vw;left:-12vw;top:-14vw" data-float="1"></div>
+    <div class="orb mag"  style="width:38vw;height:38vw;right:-10vw;bottom:-16vw" data-float="2"></div>
+    <svg class="field" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g id="constellation" stroke="rgba(60,230,255,.22)" stroke-width="1" fill="none"></g>
+    </svg>
+  </div>
+  <div class="slide-no">01 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">Model Context Protocol · Knowledge graph memory</p>
+    <div class="wordmark">
+      <h1 data-anim="chars">mnemex</h1>
+      <span class="chip" data-anim="up" data-delay=".5">v0.1.0</span>
+    </div>
+    <p class="lede" data-anim="up" data-delay=".15">
+      Persistent memory for AI assistants, stored as a <span class="c-cyan">Neo4j knowledge graph</span>
+      instead of a flat chunk index. Claims, the people who made them, and the decisions
+      that supersede each other are all first-class nodes and edges.
+    </p>
+    <div class="techstrip" data-anim="stagger" data-delay=".3">
+      <span class="chip">Neo4j Aura</span>
+      <span class="chip">Nosana GPU inference</span>
+      <span class="chip">Daytona sandboxes</span>
+      <span class="chip">TypeScript · MCP SDK</span>
+      <span class="chip">Next.js 16 demo UI</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     2 — THE PROBLEM
+     ========================================================== -->
+<section class="slide" data-title="The problem">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.18"></div>
+    <div class="orb mag" style="width:34vw;height:34vw;right:-8vw;top:-12vw"></div>
+  </div>
+  <div class="slide-no">02 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">The problem</p>
+    <h2 data-anim="up" data-delay=".08">Vector RAG remembers text.<br>It forgets <span class="c-mag">structure</span>.</h2>
+    <p class="lede" data-anim="up" data-delay=".14">
+      Chop the transcript, embed the chunks, return the nearest neighbours. That answers
+      &ldquo;what was said about X&rdquo; and fails at everything built on relationships.
+    </p>
+    <div class="grid g-3" data-anim="stagger" data-delay=".22">
+      <div class="card accent-mag">
+        <span class="tag">Failure 01</span>
+        <h3>Who held which position</h3>
+        <p>A chunk containing an objection does not record who made it. Attribution dies the moment the text is flattened.</p>
+      </div>
+      <div class="card accent-mag">
+        <span class="tag">Failure 02</span>
+        <h3>What is still true</h3>
+        <p>A reversed decision and the decision that reversed it are two similar chunks. Search returns both, with no signal which survived.</p>
+      </div>
+      <div class="card accent-mag">
+        <span class="tag">Failure 03</span>
+        <h3>How things connect</h3>
+        <p>&ldquo;What did we decide, and who disagreed&rdquo; is a two-hop traversal. No amount of top-k tuning turns it into one.</p>
+      </div>
+    </div>
+    <p class="kicker" data-anim="up" data-delay=".4">
+      The failure is not retrieval quality. The storage format threw the relationships away
+      before retrieval ever ran.
+    </p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     3 — THE SHAPE OF THE ANSWER (animated diagram)
+     ========================================================== -->
+<section class="slide" data-title="The idea">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.2"></div>
+    <div class="orb vio" style="width:40vw;height:40vw;left:-10vw;bottom:-16vw"></div>
+  </div>
+  <div class="slide-no">03 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">The idea</p>
+    <h2 data-anim="up" data-delay=".06">Store the argument, not the transcript.</h2>
+    <svg class="diagram" viewBox="0 0 980 300" role="img" aria-label="Three people take positions on a decision that is later superseded by another decision">
+      <defs>
+        <marker id="ar" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0 0 L7 3.5 L0 7 z" fill="rgba(150,185,235,.65)"/>
+        </marker>
+        <marker id="ar-mag" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0 0 L7 3.5 L0 7 z" fill="#ff3ea5"/>
+        </marker>
+        <marker id="ar-lime" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0 0 L7 3.5 L0 7 z" fill="#5ef2b5"/>
+        </marker>
+      </defs>
+
+      <!-- edges -->
+      <g fill="none" stroke-linecap="round">
+        <path class="dline" d="M150 52 L392 128"  stroke="rgba(150,185,235,.5)" stroke-width="1.4" marker-end="url(#ar)"/>
+        <path class="dline" d="M150 232 L392 152" stroke="rgba(150,185,235,.5)" stroke-width="1.4" marker-end="url(#ar)"/>
+        <path class="dline dissent" d="M150 142 L392 140" stroke="#ff3ea5" stroke-width="2.2" marker-end="url(#ar-mag)"/>
+        <path class="dline supersede" d="M700 140 L560 140" stroke="#5ef2b5" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#ar-lime)"/>
+      </g>
+
+      <!-- people -->
+      <g class="dnode">
+        <circle cx="128" cy="52" r="9" fill="#8b6cff"/>
+        <text class="node-lab strong" x="108" y="34" text-anchor="middle">Priya</text>
+        <text class="node-lab" x="108" y="70" text-anchor="end">proposes</text>
+      </g>
+      <g class="dnode">
+        <circle cx="128" cy="142" r="9" fill="#8b6cff"/>
+        <text class="node-lab strong" x="108" y="124" text-anchor="middle">Marcus</text>
+        <text class="node-lab" x="108" y="160" text-anchor="end" fill="#ff3ea5">disagrees</text>
+      </g>
+      <g class="dnode">
+        <circle cx="128" cy="232" r="9" fill="#8b6cff"/>
+        <text class="node-lab strong" x="108" y="214" text-anchor="middle">Dana</text>
+        <text class="node-lab" x="108" y="250" text-anchor="end">supports</text>
+      </g>
+
+      <!-- superseded decision -->
+      <g class="dnode">
+        <rect x="404" y="112" width="156" height="56" rx="9" fill="rgba(20,28,50,.9)" stroke="rgba(150,185,235,.35)"/>
+        <text class="node-lab strong" x="482" y="136" text-anchor="middle">Use Postgres</text>
+        <text class="edge-lab" x="482" y="154" text-anchor="middle" fill="#8aa0c6">SUPERSEDED</text>
+      </g>
+
+      <!-- current decision -->
+      <g class="dnode">
+        <rect x="704" y="112" width="176" height="56" rx="9" fill="rgba(14,40,34,.92)" stroke="rgba(94,242,181,.55)"/>
+        <text class="node-lab strong" x="792" y="136" text-anchor="middle">Move to Neo4j</text>
+        <text class="edge-lab" x="792" y="154" text-anchor="middle" fill="#5ef2b5">CURRENT</text>
+      </g>
+
+      <!-- edge labels -->
+      <text class="edge-lab dlabel" x="268" y="130" text-anchor="middle" fill="#ff3ea5">DISAGREES_WITH</text>
+      <text class="edge-lab dlabel" x="630" y="130" text-anchor="middle" fill="#5ef2b5">SUPERSEDES</text>
+    </svg>
+    <p class="kicker" data-anim="up" data-delay=".2">
+      Every one of those labels is a real edge in Neo4j. Recall is a graph traversal seeded by a
+      vector search, not a similarity ranking on its own.
+    </p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     4 — WHAT IT DOES: THREE MCP TOOLS
+     ========================================================== -->
+<section class="slide" data-title="What it does">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.16"></div>
+    <div class="orb cyan" style="width:36vw;height:36vw;right:-10vw;top:-10vw"></div>
+  </div>
+  <div class="slide-no">04 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">What it does</p>
+    <h2 data-anim="up" data-delay=".06">Four tools over stdio. One config entry.</h2>
+    <div class="grid g-4" data-anim="stagger" data-delay=".14">
+      <div class="card accent-cyan">
+        <span class="tag">Tool 01 · write</span>
+        <h3 class="c-cyan">remember</h3>
+        <p>One speaker turn: session, speaker, claims, topic, and the stance taken on a decision. Resolves the person, deduplicates restated claims, detects supersession, commits atomically.</p>
+      </div>
+      <div class="card accent-cyan">
+        <span class="tag">Tool 02 · read</span>
+        <h3 class="c-cyan">recall</h3>
+        <p>A natural-language question. Returns each decision with its status, everyone who supported or objected, the claim each made, and the supersession chain both ways.</p>
+      </div>
+      <div class="card accent-cyan">
+        <span class="tag">Tool 03 · read</span>
+        <h3 class="c-cyan">timeline</h3>
+        <p>Takes a topic. Returns its decision history in order, showing what superseded what and who dissented at each step.</p>
+      </div>
+      <div class="card accent-mag">
+        <span class="tag">Tool 04 · escape hatch</span>
+        <h3 class="c-mag">analyze</h3>
+        <p>Assistant-authored Cypher for the questions the fixed traversals miss. Read-only, executed inside a sandbox whose egress reaches nothing but the database.</p>
+      </div>
+    </div>
+    <pre data-anim="up" data-delay=".34"><span class="c">// the assistant supplies structure; mnemex does not scrape it from raw transcripts</span>
+<span class="k">remember</span>({ sessionId: <span class="s">"s1"</span>, speaker: <span class="s">"Marcus"</span>, topic: <span class="s">"storage engine"</span>,
+           claims: [<span class="s">"Our access pattern is almost entirely graph traversal."</span>],
+           decision: { statement: <span class="s">"Use Postgres as the primary datastore"</span>,
+                       stance: <span class="m">"disagrees"</span> } })</pre>
+    <p class="kicker" data-anim="up" data-delay=".42">
+      Every response carries a <span class="mono c-amber">degraded</span> array. Empty on the happy path,
+      otherwise it names the subsystem running on a fallback.
+    </p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     5 — GRAPH SCHEMA
+     ========================================================== -->
+<section class="slide" data-title="Graph schema">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.14"></div>
+    <div class="orb vio" style="width:32vw;height:32vw;left:-8vw;top:-10vw"></div>
+  </div>
+  <div class="slide-no">05 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">Graph schema</p>
+    <h2 data-anim="up" data-delay=".06">Five node labels. Eight kinds of edge.</h2>
+    <div class="split" style="align-items:start">
+      <div class="stack" data-anim="stagger" data-delay=".12">
+        <span class="tag mono c-dim" style="color:var(--dim);letter-spacing:.14em">NODES</span>
+        <div class="rows">
+          <div class="row"><span class="k">Session</span><span class="v">One conversation. id, title, startedAt</span></div>
+          <div class="row"><span class="k">Person</span><span class="v">A participant. id, name</span></div>
+          <div class="row"><span class="k">Topic</span><span class="v">Subject matter. id, name, slug</span></div>
+          <div class="row"><span class="k">Decision</span><span class="v">An outcome. statement, status, decidedAt, embedding</span></div>
+          <div class="row"><span class="k">Claim</span><span class="v">One atomic thing said. text, saidAt, embedding</span></div>
+        </div>
+        <p class="mono" style="color:var(--dim);padding-top:.4em">
+          status ∈ { <span class="c-lime">current</span>, <span class="c-amber">superseded</span>, open }
+        </p>
+      </div>
+      <div class="stack" data-anim="stagger" data-delay=".2">
+        <span class="tag mono" style="color:var(--dim);letter-spacing:.14em">EDGES</span>
+        <div class="rows">
+          <div class="row"><span class="k">STATED_BY</span><span class="v">Claim → Person. Attribution. Every position has an owner.</span></div>
+          <div class="row"><span class="k">SUPPORTS</span><span class="v">Claim → Decision. Agreement with an outcome.</span></div>
+          <div class="row"><span class="k mag">DISAGREES_WITH</span><span class="v">Claim → Decision. The edge flat chunks cannot represent.</span></div>
+          <div class="row"><span class="k mag">SUPERSEDES</span><span class="v">Decision → Decision. Enables &ldquo;what is still true&rdquo;.</span></div>
+          <div class="row"><span class="k">ABOUT</span><span class="v">Claim or Decision → Topic. Subject linkage.</span></div>
+          <div class="row"><span class="k">IN_SESSION</span><span class="v">Claim → Session. Provenance.</span></div>
+          <div class="row"><span class="k">DECIDED_IN</span><span class="v">Decision → Session. Provenance.</span></div>
+          <div class="row"><span class="k">PARTICIPATED_IN</span><span class="v">Person → Session. Roster.</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="kicker" data-anim="up" data-delay=".36">
+      Two cosine vector indexes, <span class="mono">claim_embedding</span> and
+      <span class="mono">decision_embedding</span>, at 768 dimensions. Five uniqueness constraints.
+      All of it created by one bootstrap script.
+    </p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     6 — WRITE PATH
+     ========================================================== -->
+<section class="slide" data-title="Write path">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.14"></div>
+    <div class="orb mag" style="width:30vw;height:30vw;left:-8vw;bottom:-12vw"></div>
+  </div>
+  <div class="slide-no">06 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">Write path</p>
+    <h2 data-anim="up" data-delay=".06">Untrusted text never plans its own merge.</h2>
+    <div class="split narrow-right">
+      <div class="pipe" data-anim="steps" data-delay=".14">
+        <div class="step"><span class="n">01</span><span class="t"><b>Embed on Nosana</b> <span>— claims and the decision go to a GPU-served BGE model over an OpenAI-compatible route.</span></span></div>
+        <div class="step"><span class="n">02</span><span class="t"><b>Fetch candidates</b> <span>— both vector indexes return the 25 nearest claims and decisions as a bounded candidate set.</span></span></div>
+        <div class="step sandbox"><span class="n">03</span><span class="t"><b>Plan the merge in a Daytona sandbox</b> <span>— entity resolution and supersession detection run isolated, then the plan is validated against the candidate set it was given.</span></span></div>
+        <div class="step commit"><span class="n">04</span><span class="t"><b>Commit</b> <span>— people, claims, stance edges and the supersession edge land in Neo4j.</span></span></div>
+      </div>
+      <div>
+        <div class="shot" data-anim="shot" data-delay=".3">
+          <img src="assets/ui-write.jpg" alt="The write panel of the mnemex web UI beside the live memory graph">
+        </div>
+        <p class="shot-cap" data-anim="up" data-delay=".42">Live write, graph updates in place</p>
+      </div>
+    </div>
+    <p class="kicker" data-anim="up" data-delay=".46">
+      A claim only merges into an existing one at cosine <span class="mono c-cyan">0.97</span> or above.
+      The threshold is deliberately conservative: duplicate nodes are recoverable, a wrong merge
+      attributes an argument to the wrong person.
+    </p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     7 — READ PATH
+     ========================================================== -->
+<section class="slide" data-title="Read path">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.14"></div>
+    <div class="orb cyan" style="width:32vw;height:32vw;right:-9vw;bottom:-14vw"></div>
+  </div>
+  <div class="slide-no">07 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">Read path</p>
+    <h2 data-anim="up" data-delay=".06">The vector index finds where to start. Cypher collects the answer.</h2>
+    <div class="split">
+      <div class="stack" data-anim="stagger" data-delay=".14">
+        <div class="card accent-cyan">
+          <span class="tag">Step 1 · seed</span>
+          <p>The question is embedded once, then queried against both vector indexes. This picks the entry points, and nothing more.</p>
+        </div>
+        <div class="card accent-lime">
+          <span class="tag">Step 2 · traverse</span>
+          <p>From each seed, Cypher walks out to every claim that supports or opposes the decision, to the person behind each claim, and along the supersession chain in both directions.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Step 3 · rank</span>
+          <p>Decisions that still stand sort first. What is currently true is what the caller asked for.</p>
+        </div>
+      </div>
+      <div>
+        <div class="shot" data-anim="shot" data-delay=".26">
+          <img src="assets/ui-answer.jpg" alt="Recall results showing a current decision and a superseded one, with the dissenter named">
+        </div>
+        <p class="shot-cap" data-anim="up" data-delay=".4">One question · current, superseded, and the named dissenter</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     8 — LIVE GRAPH
+     ========================================================== -->
+<section class="slide" data-title="Live memory">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.12"></div>
+    <div class="orb vio" style="width:34vw;height:34vw;left:-10vw;top:-12vw"></div>
+    <div class="orb cyan" style="width:26vw;height:26vw;right:-8vw;bottom:-10vw"></div>
+  </div>
+  <div class="slide-no">08 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">Live memory</p>
+    <h2 data-anim="up" data-delay=".06">Click a node, get its typed connections.</h2>
+    <div class="shot tall" data-anim="shot" data-delay=".14">
+      <img src="assets/ui-inspector.jpg" alt="The memory graph with a superseded decision isolated, its six typed connections listed in the inspector">
+    </div>
+    <div class="stats" data-anim="stagger" data-delay=".3">
+      <div class="stat"><span class="num">13</span><span class="lab">nodes in memory</span></div>
+      <div class="stat"><span class="num">30</span><span class="lab">edges</span></div>
+      <div class="stat"><span class="num c-mag">1</span><span class="lab">dissent edge</span></div>
+      <div class="stat"><span class="num c-lime">1</span><span class="lab">supersession</span></div>
+      <div class="stat"><span class="num">6</span><span class="lab">connections on this node</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     9 — TECHNOLOGY
+     ========================================================== -->
+<section class="slide" data-title="Technology">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.16"></div>
+    <div class="orb mag" style="width:30vw;height:30vw;right:-8vw;top:-10vw"></div>
+    <div class="orb cyan" style="width:28vw;height:28vw;left:-8vw;bottom:-12vw"></div>
+  </div>
+  <div class="slide-no">09 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">Technology</p>
+    <h2 data-anim="up" data-delay=".06">Four platforms, each on the critical path.</h2>
+    <div class="grid g-3" data-anim="stagger" data-delay=".14">
+      <div class="card accent-cyan">
+        <span class="tag">System of record</span>
+        <h3>Neo4j Aura</h3>
+        <p>Nodes, edges and both vector indexes. Reached through the official driver with lossless integers disabled and a 10-second connection ceiling.</p>
+      </div>
+      <div class="card accent-mag">
+        <span class="tag">Inference</span>
+        <h3>Nosana</h3>
+        <p>BGE-base-en-v1.5 served on a decentralised GPU market through vLLM&rsquo;s OpenAI-compatible route. Roughly seven cents an hour.</p>
+      </div>
+      <div class="card accent-mag">
+        <span class="tag">Isolation</span>
+        <h3>Daytona</h3>
+        <p>A disposable sandbox on both paths: the merge planner on write, and assistant-authored Cypher on read, egress-limited to the database host alone.</p>
+      </div>
+      <div class="card accent-cyan">
+        <span class="tag">Transport</span>
+        <h3>MCP SDK</h3>
+        <p>Three registered tools over a stdio transport, with Zod schemas doubling as the tool contract and runtime validation.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Fallback</span>
+        <h3>fastembed</h3>
+        <p>The same BGE checkpoint running locally through ONNX, so a dead GPU endpoint costs accuracy parity, not availability.</p>
+      </div>
+      <div class="card accent-lime">
+        <span class="tag">Demo surface</span>
+        <h3>Next.js 16 · React 19</h3>
+        <p>Route handlers import the compiled package rather than reimplementing it, so the page exercises the MCP code path. Graph drawn with d3-force.</p>
+      </div>
+    </div>
+    <p class="kicker" data-anim="up" data-delay=".38">
+      TypeScript in strict mode throughout. Zod validates every boundary. Vitest runs the golden
+      suite end to end against a live Aura instance, not a mock.
+    </p>
+  </div>
+</section>
+
+<!-- ==========================================================
+     10 — DEGRADATION + RUN IT
+     ========================================================== -->
+<section class="slide" data-title="Run it">
+  <div class="field">
+    <div class="grid-bg" data-parallax="0.2"></div>
+    <div class="orb cyan" style="width:42vw;height:42vw;left:-14vw;bottom:-18vw" data-float="1"></div>
+    <div class="orb mag" style="width:34vw;height:34vw;right:-10vw;top:-12vw" data-float="2"></div>
+  </div>
+  <div class="slide-no">10 / 10</div>
+  <div class="slide-content">
+    <p class="eyebrow" data-anim="up">Failure modes and setup</p>
+    <h2 data-anim="up" data-delay=".06">Nothing remote is allowed to hang the assistant.</h2>
+    <div class="split">
+      <div class="stack" data-anim="stagger" data-delay=".14">
+        <div class="deg">
+          <span class="from">Nosana unreachable</span>
+          <span class="arrow">→</span>
+          <span class="to">local ONNX model, <span class="mono c-amber">embeddings:local</span></span>
+        </div>
+        <div class="deg">
+          <span class="from">Daytona, on the write path</span>
+          <span class="arrow">→</span>
+          <span class="to">in-process merge planning, <span class="mono c-amber">normalizer:inprocess</span></span>
+        </div>
+        <div class="deg">
+          <span class="from">Daytona, on the read path</span>
+          <span class="arrow">→</span>
+          <span class="to">analyze switches off, <span class="mono c-amber">analyze:disabled</span>. Model-authored Cypher never runs unsandboxed.</span>
+        </div>
+        <div class="deg fatal">
+          <span class="from">Neo4j unreachable</span>
+          <span class="arrow">✕</span>
+          <span class="to">the write throws. Memory that silently vanishes is worse than an error.</span>
+        </div>
+        <div class="stats" style="padding-top:.6em">
+          <div class="stat"><span class="num">3s</span><span class="lab">remote budget</span></div>
+          <div class="stat"><span class="num">15s</span><span class="lab">sandbox budget</span></div>
+          <div class="stat"><span class="num c-lime">642ms</span><span class="lab">measured recall</span></div>
+        </div>
+      </div>
+      <div class="stack">
+        <pre data-anim="up" data-delay=".26"><span class="c"># set up</span>
+git clone https://github.com/Sizbei/mnemex.git
+npm install &amp;&amp; cp .env.example .env
+npm run <span class="k">bootstrap</span>   <span class="c"># constraints + vector indexes</span>
+npm run <span class="k">build</span>
+
+<span class="c"># see it work</span>
+npm run <span class="k">seed</span> -- --reset
+npm run <span class="k">demo</span>
+
+<span class="c"># give an assistant durable memory</span>
+claude mcp add mnemex -- node <span class="s">"$(pwd)/dist/src/server.js"</span></pre>
+        <p class="shot-cap" data-anim="up" data-delay=".38">Pass the environment in the MCP config: the client launches the server from an arbitrary directory.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hasGsap = typeof window.gsap !== "undefined";
+
+  /* ----------------------------------------------------------
+     Nav chrome: progress bar + dot rail
+     ---------------------------------------------------------- */
+  const dotRail = document.getElementById("dots");
+  const progress = document.getElementById("progress");
+
+  slides.forEach((s, i) => {
+    const b = document.createElement("button");
+    b.className = "dot";
+    b.type = "button";
+    b.setAttribute("aria-label", `Slide ${i + 1}: ${s.dataset.title || ""}`);
+    b.addEventListener("click", () => goTo(i));
+    dotRail.appendChild(b);
+  });
+  const dots = Array.from(dotRail.children);
+
+  let current = 0;
+  function setCurrent(i) {
+    current = i;
+    dots.forEach((d, n) => d.setAttribute("aria-current", String(n === i)));
+    progress.style.width = ((i + 1) / slides.length) * 100 + "%";
+  }
+  function goTo(i) {
+    const n = Math.max(0, Math.min(slides.length - 1, i));
+    slides[n].scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+    setCurrent(n);
+  }
+
+  /* ----------------------------------------------------------
+     Keyboard, wheel and touch navigation.
+     Scroll-snap does the moving; these just pick the target.
+     ---------------------------------------------------------- */
+  window.addEventListener("keydown", (e) => {
+    const k = e.key;
+    if (k === "ArrowRight" || k === "ArrowDown" || k === "PageDown" || k === " ") {
+      e.preventDefault(); goTo(current + 1);
+    } else if (k === "ArrowLeft" || k === "ArrowUp" || k === "PageUp") {
+      e.preventDefault(); goTo(current - 1);
+    } else if (k === "Home") { e.preventDefault(); goTo(0); }
+    else if (k === "End")   { e.preventDefault(); goTo(slides.length - 1); }
+  });
+
+  let wheelLock = false;
+  window.addEventListener("wheel", (e) => {
+    if (Math.abs(e.deltaY) < 18 || wheelLock) return;
+    wheelLock = true;
+    goTo(current + (e.deltaY > 0 ? 1 : -1));
+    setTimeout(() => { wheelLock = false; }, 620);
+  }, { passive: true });
+
+  let touchY = null;
+  window.addEventListener("touchstart", (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+  window.addEventListener("touchend", (e) => {
+    if (touchY === null) return;
+    const dy = touchY - e.changedTouches[0].clientY;
+    if (Math.abs(dy) > 55) goTo(current + (dy > 0 ? 1 : -1));
+    touchY = null;
+  }, { passive: true });
+
+  /* ----------------------------------------------------------
+     Reveal animations. One GSAP timeline per slide, built once
+     and replayed whenever the slide comes back into view.
+     ---------------------------------------------------------- */
+  function splitChars(el) {
+    if (el.dataset.split === "done") return Array.from(el.querySelectorAll(".ch"));
+    const text = el.textContent;
+    el.textContent = "";
+    const spans = Array.from(text).map((c) => {
+      const s = document.createElement("span");
+      s.className = "ch";
+      s.style.display = "inline-block";
+      s.style.willChange = "transform,opacity";
+      s.textContent = c === " " ? " " : c;
+      el.appendChild(s);
+      return s;
+    });
+    el.dataset.split = "done";
+    return spans;
+  }
+
+  function buildTimeline(slide) {
+    const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
+
+    slide.querySelectorAll("[data-anim]").forEach((el) => {
+      const at = parseFloat(el.dataset.delay || "0");
+      const kind = el.dataset.anim;
+
+      if (kind === "chars") {
+        tl.from(splitChars(el), {
+          yPercent: 118, opacity: 0, duration: .9, stagger: .045,
+          ease: "expo.out"
+        }, at);
+
+      } else if (kind === "stagger") {
+        tl.from(Array.from(el.children), {
+          y: 26, opacity: 0, duration: .68, stagger: .085
+        }, at);
+
+      } else if (kind === "steps") {
+        // Pipeline stages light up one after another, left border first.
+        const steps = Array.from(el.children);
+        tl.from(steps, { x: -22, opacity: 0, duration: .55, stagger: .13 }, at);
+        steps.forEach((s, i) => {
+          tl.fromTo(s, { borderLeftWidth: "2px" },
+            { borderLeftWidth: "5px", duration: .22, yoyo: true, repeat: 1 },
+            at + .18 + i * .13);
+        });
+
+      } else if (kind === "shot") {
+        tl.from(el, { y: 34, opacity: 0, scale: .975, duration: .85 }, at);
+
+      } else {
+        tl.from(el, { y: 22, opacity: 0, duration: .62 }, at);
+      }
+    });
+
+    // Slide 3's diagram draws itself: edges stroke on, nodes pop, labels fade.
+    const lines = slide.querySelectorAll(".dline");
+    if (lines.length) {
+      lines.forEach((p) => {
+        const len = p.getTotalLength();
+        gsap.set(p, { strokeDasharray: p.classList.contains("supersede") ? "7 6" : len, strokeDashoffset: len });
+      });
+      tl.to(lines, { strokeDashoffset: 0, duration: .8, stagger: .12 }, .25);
+      tl.from(slide.querySelectorAll(".dnode"), { scale: .6, opacity: 0, transformOrigin: "center", duration: .5, stagger: .09 }, .15);
+      tl.from(slide.querySelectorAll(".dlabel"), { opacity: 0, duration: .4, stagger: .12 }, .9);
+    }
+
+    return tl;
+  }
+
+  const timelines = new Map();
+  if (hasGsap && !reduced) {
+    slides.forEach((s) => timelines.set(s, buildTimeline(s)));
+  }
+
+  /* ----------------------------------------------------------
+     Intersection Observer drives both the active-slide state
+     and the reveal timelines.
+     ---------------------------------------------------------- */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const i = slides.indexOf(entry.target);
+      setCurrent(i);
+      const tl = timelines.get(entry.target);
+      if (tl) tl.restart();
+    });
+  }, { threshold: 0.55 });
+
+  slides.forEach((s) => io.observe(s));
+
+  /* ----------------------------------------------------------
+     Ambient motion: drifting orbs, parallax grid, and the
+     constellation on the title slide.
+     ---------------------------------------------------------- */
+  if (hasGsap && !reduced) {
+    gsap.utils.toArray("[data-float]").forEach((el, i) => {
+      gsap.to(el, {
+        x: i % 2 ? -40 : 46, y: i % 2 ? 34 : -30,
+        duration: 13 + i * 3, repeat: -1, yoyo: true, ease: "sine.inOut"
+      });
+    });
+
+    gsap.utils.toArray("[data-parallax]").forEach((el) => {
+      gsap.to(el, {
+        y: () => -window.innerHeight * parseFloat(el.dataset.parallax),
+        ease: "none",
+        scrollTrigger: null
+      });
+      // No ScrollTrigger plugin loaded; drive the parallax from scroll directly.
+    });
+
+    // Title-slide constellation: nodes and links that breathe.
+    const g = document.getElementById("constellation");
+    if (g) {
+      const pts = Array.from({ length: 22 }, () => ({
+        x: 60 + Math.random() * 880,
+        y: 40 + Math.random() * 520
+      }));
+      pts.forEach((p, i) => {
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
+        c.setAttribute("r", 1.8 + Math.random() * 2.2);
+        c.setAttribute("fill", i % 5 === 0 ? "#ff3ea5" : "#3ce6ff");
+        c.setAttribute("opacity", ".55");
+        g.appendChild(c);
+        gsap.to(c, {
+          attr: { cy: p.y + (Math.random() * 30 - 15), cx: p.x + (Math.random() * 30 - 15) },
+          duration: 8 + Math.random() * 8, repeat: -1, yoyo: true, ease: "sine.inOut"
+        });
+      });
+      // Link only near neighbours, so the field reads as a graph and not a mesh.
+      pts.forEach((a, i) => pts.slice(i + 1).forEach((b) => {
+        if (Math.hypot(a.x - b.x, a.y - b.y) > 170) return;
+        const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        l.setAttribute("x1", a.x); l.setAttribute("y1", a.y);
+        l.setAttribute("x2", b.x); l.setAttribute("y2", b.y);
+        l.setAttribute("opacity", ".22");
+        g.appendChild(l);
+      }));
+      gsap.from(g.children, { opacity: 0, duration: 1.4, stagger: .012, delay: .2 });
+    }
+  }
+
+  /* Grid parallax without the ScrollTrigger plugin. */
+  const parallaxEls = Array.from(document.querySelectorAll("[data-parallax]"));
+  if (!reduced && parallaxEls.length) {
+    let ticking = false;
+    window.addEventListener("scroll", () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        parallaxEls.forEach((el) => {
+          const rect = el.parentElement.parentElement.getBoundingClientRect();
+          const rel = (rect.top / window.innerHeight);
+          el.style.transform = `translate3d(0, ${rel * parseFloat(el.dataset.parallax) * 90}px, 0)`;
+        });
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
+  setCurrent(0);
+})();
+</script>
+</body>
+</html>

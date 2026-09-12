@@ -17,6 +17,7 @@ const Schema = z.object({
   EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().default(768),
   REMOTE_TIMEOUT_MS: z.coerce.number().int().positive().default(3000),
   DAYTONA_TIMEOUT_MS: z.coerce.number().int().positive().default(15000),
+  ANALYZE_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
 });
 
 export interface Config {
@@ -27,6 +28,14 @@ export interface Config {
   remoteTimeoutMs: number;
   /** Daytona needs its own budget: sandbox create alone ranges 0.9 to 6.3 seconds. */
   daytonaTimeoutMs: number;
+  /**
+   * analyze gets a longer budget than the write path. Measured 3.4 to 5 seconds
+   * typical with a 13.4 second outlier, because domainAllowList adds proxy setup
+   * to create. The write path must keep the short budget: it falls back in
+   * process, so a slow sandbox should degrade quickly rather than stall a write.
+   * analyze has no fallback by design, so waiting is the only useful option.
+   */
+  analyzeTimeoutMs: number;
 }
 
 export function loadConfig(): Config {
@@ -53,5 +62,6 @@ export function loadConfig(): Config {
     embeddingDimensions: e.EMBEDDING_DIMENSIONS,
     remoteTimeoutMs: e.REMOTE_TIMEOUT_MS,
     daytonaTimeoutMs: e.DAYTONA_TIMEOUT_MS,
+    analyzeTimeoutMs: e.ANALYZE_TIMEOUT_MS,
   };
 }

@@ -26,9 +26,6 @@ const DISSENT = "#fbbf24";
 
 const RADIUS: Record<string, number> = { Decision: 15, Person: 12, Topic: 11, Claim: 8, Session: 9 };
 
-/** Claim circles are only 16px across. Without slack the cursor lands on the canvas instead. */
-const HIT_SLACK = 10;
-
 /** Screen pixels of travel before a press counts as a drag rather than a click. */
 const DRAG_SLOP = 4;
 
@@ -122,36 +119,45 @@ export function GraphCanvas({
     return transformRef.current.invert([x, y]);
   }, []);
 
+  /**
+   * A click and a drag start identically, so neither is committed on the press.
+   * The gesture is measured from where it began, in screen pixels, which keeps a
+   * click a click at every zoom level; accumulating per-move distance instead
+   * turned the jitter of a steady hand into a drag and swallowed the selection.
+   */
   const onPointerDown = (e: React.PointerEvent<SVGGElement>, node: Node) => {
     e.stopPropagation();
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
-    dragRef.current = { node, moved: 0 };
-    const [x, y] = toGraph(e.clientX, e.clientY);
-    node.fx = x;
-    node.fy = y;
-    simRef.current?.alphaTarget(0.15).restart();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragRef.current = { node, x0: e.clientX, y0: e.clientY, dragging: false };
   };
 
   const onPointerMove = (e: React.PointerEvent<SVGGElement>) => {
     const d = dragRef.current;
     if (!d) return;
+    if (!d.dragging) {
+      if (Math.hypot(e.clientX - d.x0, e.clientY - d.y0) < DRAG_SLOP) return;
+      // Reheating on the press made a plain click shove the whole layout around,
+      // so the simulation only wakes once the gesture is certainly a drag.
+      d.dragging = true;
+      simRef.current?.alphaTarget(0.15).restart();
+    }
     const [x, y] = toGraph(e.clientX, e.clientY);
-    d.moved += Math.hypot((d.node.fx ?? x) - x, (d.node.fy ?? y) - y);
     d.node.fx = x;
     d.node.fy = y;
   };
 
-  const onPointerUp = (e: React.PointerEvent<SVGGElement>, node: Node) => {
+  const onPointerUp = (node: Node) => {
     const d = dragRef.current;
+    if (!d) return;
     dragRef.current = null;
     simRef.current?.alphaTarget(0);
-    (e.currentTarget as Element).releasePointerCapture(e.pointerId);
-    // A press that barely moved is a click, not a drag.
-    if (d && d.moved < 5) {
-      node.fx = null;
-      node.fy = null;
-      onSelect(selectedId === node.id ? null : node);
-    }
+    if (!d.dragging) onSelect(selectedId === node.id ? null : node);
+  };
+
+  /** A cancelled gesture would otherwise leave alphaTarget up and the graph drifting forever. */
+  const onPointerCancel = () => {
+    dragRef.current = null;
+    simRef.current?.alphaTarget(0);
   };
 
   const resetView = () => {
@@ -169,7 +175,7 @@ export function GraphCanvas({
         ref={svgRef}
         viewBox="-380 -250 760 500"
         className="h-[560px] w-full cursor-grab rounded-xl border border-neutral-800 bg-neutral-900/40 active:cursor-grabbing"
-        onPointerDown={() => onSelect(null)}
+        onClick={() => onSelect(null)}
       >
         <defs>
           <marker id="arrow" viewBox="0 -5 10 10" refX="22" markerWidth="5" markerHeight="5" orient="auto">
@@ -217,7 +223,9 @@ export function GraphCanvas({
                 style={{ transition: "opacity 200ms cubic-bezier(0.23,1,0.32,1)", touchAction: "none" }}
                 onPointerDown={(e) => onPointerDown(e, n)}
                 onPointerMove={onPointerMove}
-                onPointerUp={(e) => onPointerUp(e, n)}
+                onPointerUp={() => onPointerUp(n)}
+                onPointerCancel={onPointerCancel}
+                onClick={(e) => e.stopPropagation()}
                 onMouseEnter={() => setHovered(n.id)}
                 onMouseLeave={() => setHovered(null)}
               >

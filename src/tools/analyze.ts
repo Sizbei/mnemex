@@ -46,8 +46,8 @@ export async function analyze(raw: AnalyzeInput): Promise<AnalyzeResult> {
     throw new Error("analyze accepts read-only Cypher; this query contains a write clause");
   }
 
-  const { daytona, neo4j, daytonaTimeoutMs } = loadConfig();
-  const timeoutSec = Math.ceil(daytonaTimeoutMs / 1000);
+  const { daytona, neo4j, analyzeTimeoutMs } = loadConfig();
+  const timeoutSec = Math.ceil(analyzeTimeoutMs / 1000);
   const { url, host } = queryApi(neo4j.uri, neo4j.database);
 
   let sandbox: Sandbox | undefined;
