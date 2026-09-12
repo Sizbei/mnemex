@@ -3,6 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { chatCompletionsUrl, chatEndpoint, chatModel, host, MISSING_ENDPOINT_MESSAGE, port, repoRoot } from "./env.js";
 import { runTurn, type ChatMessage } from "./chat.js";
 import { TurnStream } from "./events.js";
+import { memoryGraph } from "./memory.js";
 import { MISSING_BUILD_MESSAGE, serveStatic } from "./static.js";
 import { toolDefinitions } from "./tools.js";
 
@@ -116,6 +117,17 @@ async function handle(request: IncomingMessage, response: ServerResponse): Promi
     // No tool here needs approval: all three act only on this project's own graph, and the
     // backend never emits tool.call.awaiting_approval, so nothing can be waiting.
     json(response, 200, {});
+    return;
+  }
+
+  if (route === "/memory") {
+    // Not part of the AgentCanvas runtime seam: it rides on the same prefix so the Vite dev
+    // proxy and the single-port deployment both reach it without a second rule.
+    try {
+      json(response, 200, { ok: true, ...(await memoryGraph()) });
+    } catch (error) {
+      json(response, 500, { ok: false, error: String(error) });
+    }
     return;
   }
 
