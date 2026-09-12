@@ -8,6 +8,12 @@ const Schema = z.object({
   NEO4J_USERNAME: z.string().min(1),
   NEO4J_PASSWORD: z.string().min(1),
   NEO4J_DATABASE: z.string().min(1),
+  /**
+   * Bolt is the default and is faster. "http" exists because Daytona sandboxes
+   * cannot reach port 7687 at all, only 80 and 443, so anything deployed into
+   * one has to use Aura's HTTPS query API instead.
+   */
+  NEO4J_TRANSPORT: z.enum(["bolt", "http"]).default("bolt"),
   NOSANA_API_KEY: z.string().min(1),
   NOSANA_API_URL: z.string().url(),
   NOSANA_MARKET: z.string().min(1),
@@ -21,7 +27,7 @@ const Schema = z.object({
 });
 
 export interface Config {
-  neo4j: { uri: string; username: string; password: string; database: string };
+  neo4j: { uri: string; username: string; password: string; database: string; transport: "bolt" | "http" };
   nosana: { apiKey: string; apiUrl: string; market: string; endpoint: string | null };
   daytona: { apiKey: string; apiUrl: string };
   embeddingDimensions: number;
@@ -51,6 +57,7 @@ export function loadConfig(): Config {
       username: e.NEO4J_USERNAME,
       password: e.NEO4J_PASSWORD,
       database: e.NEO4J_DATABASE,
+      transport: e.NEO4J_TRANSPORT,
     },
     nosana: {
       apiKey: e.NOSANA_API_KEY,
