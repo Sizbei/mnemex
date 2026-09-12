@@ -1,0 +1,33 @@
+{
+  "name": "mnemex",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "mnemex": "./dist/src/server.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/server.ts",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "bootstrap": "tsx scripts/bootstrap-graph.ts",
+    "deploy:nosana": "tsx scripts/deploy-nosana.ts",
+    "seed": "tsx scripts/seed-demo.ts",
+    "demo": "tsx scripts/demo.ts"
+  },
+  "dependencies": {
+    "@daytonaio/sdk": "^0.211.2",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "dotenv": "^16.4.5",
+    "fastembed": "^2.1.0",
+    "neo4j-driver": "^5.28.0",
+    "zod": "^4.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
