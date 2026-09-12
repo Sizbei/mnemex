@@ -375,6 +375,27 @@ pre .m{color:var(--magenta)}
   .stats{gap:.6rem}
 }
 
+/* ===========================================
+   PRINT / PDF: one slide per page, 16:9
+   Rendered at 13.333in x 7.5in, which is 1280x720
+   at 96dpi, so vw/vh and every clamp() resolve to
+   the same layout the deck is validated at.
+   =========================================== */
+@media print{
+  @page{size:13.333in 7.5in;margin:0}
+  html,body{height:auto;overflow:visible;background:var(--bg)}
+  html{scroll-snap-type:none}
+  .slide{
+    width:13.333in;height:7.5in;
+    break-after:page;page-break-after:always;
+    scroll-snap-align:none;
+  }
+  .slide:last-of-type{break-after:auto;page-break-after:auto}
+  .progress,.dots,.hint{display:none !important}
+  /* Keep the dark ground and every accent; browsers drop backgrounds otherwise. */
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.2s !important}
   html{scroll-behavior:auto}
@@ -792,9 +813,9 @@ pre .m{color:var(--magenta)}
   </div>
   <div class="slide-no">10 / 11</div>
   <div class="slide-content">
-    <p class="eyebrow" data-anim="up">Build status &middot; two of five agents reported</p>
-    <h2 data-anim="up" data-delay=".06">Both landed working infrastructure, not scaffolding.</h2>
-    <div class="split" style="align-items:start">
+    <p class="eyebrow" data-anim="up">Build status</p>
+    <h2 data-anim="up" data-delay=".06">Two of five agents in. Both landed working infrastructure, not scaffolding.</h2>
+    <div class="split">
       <div class="stack" data-anim="stagger" data-delay=".14">
         <div class="card accent-cyan">
           <span class="tag">Verified &middot; tool 04</span>
@@ -802,7 +823,8 @@ pre .m{color:var(--magenta)}
           <p>A real analytical query ran generated Cypher inside a Daytona sandbox against a read-only credential, with nothing degraded. Writes are refused in under half a second, without ever creating a sandbox. All four tools are registered.</p>
           <p>Analyze was given its own timeout, separate from the write path: it has no fallback by design, so waiting out a slow sandbox is the only useful response, where a write should degrade in process quickly.</p>
         </div>
-        <pre><span class="c">// stance per person — fixed traversals cannot</span>
+        <pre><span class="c">// the full stance breakdown, per person.</span>
+<span class="c">// no fixed traversal returns this shape.</span>
 Priya    <span class="k">SUPPORTS</span>          2
 Marcus   <span class="m">DISAGREES_WITH</span>    1
 Dana     <span class="k">SUPPORTS</span>          1
@@ -905,7 +927,10 @@ claude mcp add mnemex -- node <span class="s">"$(pwd)/dist/src/server.js"</span>
   "use strict";
 
   const slides = Array.from(document.querySelectorAll(".slide"));
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // ?print=1 renders every slide in its settled, post-animation state. Printing
+  // otherwise captures whatever the reveal timelines happened to be mid-way through.
+  const printMode = new URLSearchParams(location.search).has("print");
+  const reduced = printMode || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const hasGsap = typeof window.gsap !== "undefined";
 
   /* ----------------------------------------------------------
@@ -1081,7 +1106,11 @@ claude mcp add mnemex -- node <span class="s">"$(pwd)/dist/src/server.js"</span>
       // No ScrollTrigger plugin loaded; drive the parallax from scroll directly.
     });
 
-    // Title-slide constellation: nodes and links that breathe.
+  }
+
+  // Title-slide constellation. Drawn whenever GSAP is present; it only breathes
+  // when motion is allowed, so the print render still gets the star field.
+  if (hasGsap) {
     const g = document.getElementById("constellation");
     if (g) {
       const pts = Array.from({ length: 22 }, () => ({
@@ -1095,7 +1124,7 @@ claude mcp add mnemex -- node <span class="s">"$(pwd)/dist/src/server.js"</span>
         c.setAttribute("fill", i % 5 === 0 ? "#ff3ea5" : "#3ce6ff");
         c.setAttribute("opacity", ".55");
         g.appendChild(c);
-        gsap.to(c, {
+        if (!reduced) gsap.to(c, {
           attr: { cy: p.y + (Math.random() * 30 - 15), cx: p.x + (Math.random() * 30 - 15) },
           duration: 8 + Math.random() * 8, repeat: -1, yoyo: true, ease: "sine.inOut"
         });
@@ -1109,7 +1138,7 @@ claude mcp add mnemex -- node <span class="s">"$(pwd)/dist/src/server.js"</span>
         l.setAttribute("opacity", ".22");
         g.appendChild(l);
       }));
-      gsap.from(g.children, { opacity: 0, duration: 1.4, stagger: .012, delay: .2 });
+      if (!reduced) gsap.from(g.children, { opacity: 0, duration: 1.4, stagger: .012, delay: .2 });
     }
   }
 

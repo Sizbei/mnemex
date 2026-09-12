@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+import { z } from "zod";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,16 +14,31 @@ export const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "
 // both this server and the tools it calls see the same values from any cwd.
 config({ path: join(repoRoot, ".env") });
 
-/** Unset is the expected state before the chat model is deployed, not an error. */
-export const chatEndpoint = (process.env.NOSANA_CHAT_ENDPOINT ?? "").trim();
+/**
+ * These four belong to this backend, not to the MCP server, which is why they are validated
+ * here rather than in src/config.ts. Unvalidated `Number(...)` coercion was silently turning
+ * a typo into NaN, which then read as an immediate timeout.
+ */
+const Schema = z.object({
+  /** Unset is the expected state before the chat model is deployed, not an error. */
+  NOSANA_CHAT_ENDPOINT: z.string().trim().default(""),
+  /** vLLM is started with `--served-model-name chat`, so that is the id the API expects. */
+  NOSANA_CHAT_MODEL: z.string().trim().min(1).default("chat"),
+  MNEMEX_UI_PORT: z.coerce.number().int().positive().max(65535).default(8787),
+  /** Milliseconds to wait for the model's response headers. The stream itself is unbounded. */
+  MNEMEX_CHAT_CONNECT_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+});
 
-/** vLLM is started with `--served-model-name chat`, so that is the id the API expects. */
-export const chatModel = (process.env.NOSANA_CHAT_MODEL ?? "").trim() || "chat";
+const parsed = Schema.safeParse(process.env);
+if (!parsed.success) {
+  const bad = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
+  throw new Error(`Invalid chat backend environment: ${bad}`);
+}
 
-export const port = Number(process.env.MNEMEX_UI_PORT ?? 8787);
-
-/** Milliseconds to wait for the model's response headers. The stream itself is unbounded. */
-export const connectTimeoutMs = Number(process.env.MNEMEX_CHAT_CONNECT_TIMEOUT_MS ?? 30_000);
+export const chatEndpoint = parsed.data.NOSANA_CHAT_ENDPOINT;
+export const chatModel = parsed.data.NOSANA_CHAT_MODEL;
+export const port = parsed.data.MNEMEX_UI_PORT;
+export const connectTimeoutMs = parsed.data.MNEMEX_CHAT_CONNECT_TIMEOUT_MS;
 
 /**
  * The deployment prints a bare host, but an OpenAI-compatible client needs the /v1 route.

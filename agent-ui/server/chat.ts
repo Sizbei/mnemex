@@ -76,7 +76,7 @@ export async function runTurn(input: {
               tool_calls: completion.toolCalls.map((call) => ({
                 id: call.id,
                 type: "function" as const,
-                function: { name: call.name, arguments: call.args },
+                function: { name: call.name, arguments: canonicalArguments(call.args) },
               })),
             }
           : {}),
@@ -107,6 +107,25 @@ export async function runTurn(input: {
     }
     const message = describeFailure(error);
     stream.end("run.error", { code: "chat_failed", message, userMessage: message });
+  }
+}
+
+/**
+ * Re-serialise tool-call arguments before they go back into the conversation.
+ *
+ * A 7B model driving the hermes parser emits malformed JSON often enough to matter, and the
+ * raw string is echoed into every subsequent request. One bad call then makes the chat
+ * endpoint reject the whole conversation with a 400, which reads as the model dying
+ * mid-turn even though the tool itself may have succeeded. Round-tripping through a parse
+ * keeps the transcript valid; an unparseable call becomes an empty object, and the matching
+ * tool result already explains the failure so the model can correct itself.
+ */
+function canonicalArguments(raw: string): string {
+  if (!raw.trim()) return "{}";
+  try {
+    return JSON.stringify(JSON.parse(raw));
+  } catch {
+    return "{}";
   }
 }
 
@@ -174,24 +193,23 @@ function compactForModel(name: ToolName, result: unknown): string {
 }
 
 /**
- * recall reports supersession as arrays of decision ids. A model handed raw uuids cannot say
- * which decision replaced which, and a 7B model asked to guess will state the reversal
- * backwards. Dereference the ids against the same payload and drop them; the card keeps the
- * untouched result either way.
+ * Rename recall's supersession fields and drop the node ids before the model sees them.
+ *
+ * recall already returns `supersedes` and `supersededBy` as decision statements, not ids.
+ * The two names are near-homographs that differ by one suffix, and a 7B model reading them
+ * states the reversal backwards about as often as not. "overrules" and "overruledBy" are
+ * unambiguous. The ids go too: they are uuids the model can only misquote, and the tool
+ * card still shows the untouched result.
  */
 function shapeForModel(name: ToolName, result: unknown): unknown {
   if (name !== "recall") return result;
   const value = result as { decisions?: any[]; degraded?: string[] };
-  const statements = new Map<string, string>(
-    (value.decisions ?? []).map((decision) => [decision.id, decision.statement]),
-  );
-  const resolve = (ids: string[] = []) => ids.map((id) => statements.get(id) ?? id);
   return {
     decisions: (value.decisions ?? []).map((decision) => ({
       statement: decision.statement,
       status: decision.status,
-      overrules: resolve(decision.supersedes),
-      overruledBy: resolve(decision.supersededBy),
+      overrules: decision.supersedes ?? [],
+      overruledBy: decision.supersededBy ?? [],
       positions: decision.positions,
     })),
     degraded: value.degraded,

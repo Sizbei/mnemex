@@ -174,6 +174,8 @@ export function GraphCanvas({
       <svg
         ref={svgRef}
         viewBox="-380 -250 760 500"
+        role="img"
+        aria-label="Force-directed graph of memory. People, claims, decisions, topics and sessions, with edges for dissent and supersession."
         className="h-[560px] w-full cursor-grab rounded-xl border border-neutral-800 bg-neutral-900/40 active:cursor-grabbing"
         onClick={() => onSelect(null)}
       >
@@ -274,7 +276,7 @@ export function GraphCanvas({
       >
         reset layout
       </button>
-      <p className="pointer-events-none absolute bottom-5 left-5 text-[11px] text-neutral-600">
+      <p className="pointer-events-none absolute bottom-5 left-5 text-[11px] text-neutral-400">
         drag nodes · scroll to zoom · click to isolate
       </p>
     </div>

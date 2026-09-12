@@ -58,7 +58,23 @@ MATCH (n) WHERE n:Person OR n:Claim OR n:Decision OR n:Topic OR n:Session DETACH
 
 ```bash
 npm run build
-claude mcp add mnemex -- node "$(pwd)/dist/src/server.js"
+claude mcp add mnemex \
+  --env NEO4J_URI="$NEO4J_URI" \
+  --env NEO4J_USERNAME="$NEO4J_USERNAME" \
+  --env NEO4J_PASSWORD="$NEO4J_PASSWORD" \
+  --env NEO4J_DATABASE="$NEO4J_DATABASE" \
+  --env NOSANA_API_KEY="$NOSANA_API_KEY" \
+  --env NOSANA_API_URL="$NOSANA_API_URL" \
+  --env NOSANA_MARKET="$NOSANA_MARKET" \
+  --env NOSANA_ENDPOINT="$NOSANA_ENDPOINT" \
+  --env DAYTONA_API_KEY="$DAYTONA_API_KEY" \
+  --env DAYTONA_API_URL="$DAYTONA_API_URL" \
+  -- node "$(pwd)/dist/src/server.js"
+
+The environment must be passed inline. The server loads `.env` relative to its
+working directory, and an MCP client launches it from wherever the client
+happens to be, not from the repo root. Source `.env` in your shell first so the
+variables above expand.
 set -a && . ./.env && set +a
 claude mcp add neo4j -- uvx mcp-neo4j-cypher@latest \
   --db-url "$NEO4J_URI" --username "$NEO4J_USERNAME" --password "$NEO4J_PASSWORD" --database "$NEO4J_DATABASE"
