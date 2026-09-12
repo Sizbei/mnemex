@@ -11,5 +11,13 @@
     "resolveJsonModule": true,
     "declaration": false
   },
-  "include": ["src/**/*.ts", "scripts/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "scripts/**/*.ts"
+  ],
+  "exclude": [
+    "web",
+    "node_modules",
+    "dist"
+  ]
 }

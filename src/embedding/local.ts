@@ -1,6 +1,13 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { EmbeddingModel, FlagEmbedding } from "fastembed";
 import type { EmbeddingProvider } from "./types.js";
+
+/** Repo root, whether running from src/ under tsx or dist/src/ after a build. */
+const MODEL_CACHE = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  import.meta.url.includes("/dist/") ? "../../../.model_cache" : "../../.model_cache",
+);
 
 let ready: Promise<FlagEmbedding> | undefined;
 
@@ -11,10 +18,11 @@ function model(): Promise<FlagEmbedding> {
     // not the same vector space.
     model: EmbeddingModel.BGEBaseENV15,
     maxLength: 512,
-    // Defaults to the relative path "local_cache" against process.cwd().
-    // An MCP client launches this server with an arbitrary cwd, so a relative
-    // path silently re-downloads 195 MB into random directories.
-    cacheDir: path.resolve(process.cwd(), ".model_cache"),
+    // Resolved against this module, never process.cwd(). fastembed's default is
+    // the relative path "local_cache", and both an MCP client and a Next.js
+    // server launch with an arbitrary cwd, which silently re-downloads 195 MB
+    // into random directories.
+    cacheDir: MODEL_CACHE,
     showDownloadProgress: false,
   });
   return ready;
