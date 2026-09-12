@@ -1,0 +1,345 @@
+/*
+ * The graph came from web/, which is Tailwind. agent-ui is not, so the utility strings are
+ * restated here as rules. Every value below is the literal Tailwind value it replaces
+ * (neutral-800 = #262626, neutral-900/40 = rgba(23,23,23,0.4), gap-2 = 8px, and so on), so
+ * the two copies look the same on screen.
+ *
+ * The panel keeps the graph's own dark ground rather than the shell's warm-graphite surface.
+ * The node palette was picked against #0a0a0a; dropping it onto a light panel would change
+ * what the colours mean.
+ */
+
+.mnemex-memory-panel {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: clamp(340px, 36%, 520px);
+  min-height: 0;
+  border-left: 1px solid #262626;
+  background: #0a0a0a;
+  color: #d4d4d4;
+  font-size: 13px;
+}
+
+.mnemex-memory-panel[data-collapsed="true"] {
+  width: 44px;
+}
+
+.mnemex-memory-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  padding: 14px 16px;
+  border-bottom: 1px solid #262626;
+}
+
+.mnemex-memory-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a3a3a3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mnemex-memory-action {
+  flex: none;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #a3a3a3;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: color 100ms ease-out, background 100ms ease-out;
+}
+
+.mnemex-memory-action:hover:not(:disabled) {
+  background: rgba(38, 38, 38, 0.8);
+  color: #f5f5f5;
+}
+
+.mnemex-memory-action:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* The collapsed rail: one vertical strip that reopens the panel. */
+.mnemex-memory-rail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #a3a3a3;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  cursor: pointer;
+  transition: color 100ms ease-out;
+}
+
+.mnemex-memory-rail:hover {
+  color: #f5f5f5;
+}
+
+.mnemex-memory-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.mnemex-memory-body::-webkit-scrollbar {
+  width: 0;
+  display: none;
+}
+
+.mnemex-memory-message {
+  padding: 16px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a3a3a3;
+}
+
+.mnemex-memory-graph {
+  /* A fixed share, not 1fr: selecting a node grows the inspector, and a canvas that shrank
+     underneath it would move the node out from under the cursor that just picked it. */
+  flex: 0 0 58%;
+  min-height: 320px;
+  padding: 12px;
+}
+
+/* ------------------------------------------------------------------ canvas */
+
+.mnemex-graph-canvas {
+  position: relative;
+  height: 100%;
+}
+
+.mnemex-graph-canvas > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #262626;
+  border-radius: 12px;
+  background: rgba(23, 23, 23, 0.4);
+  cursor: grab;
+}
+
+.mnemex-graph-canvas > svg:active {
+  cursor: grabbing;
+}
+
+.mnemex-graph-node {
+  cursor: pointer;
+}
+
+.mnemex-graph-label {
+  pointer-events: none;
+  user-select: none;
+}
+
+.mnemex-graph-legend {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  row-gap: 8px;
+  pointer-events: none;
+  font-size: 11px;
+}
+
+.mnemex-graph-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a3a3a3;
+}
+
+.mnemex-graph-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.mnemex-graph-rule {
+  width: 20px;
+  height: 2px;
+}
+
+.mnemex-graph-rule-dashed {
+  width: 20px;
+  height: 2px;
+  border-top: 2px dashed #a3a3a3;
+}
+
+.mnemex-graph-reset {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  padding: 6px 12px;
+  border: 1px solid #404040;
+  border-radius: 6px;
+  background: rgba(23, 23, 23, 0.9);
+  color: #d4d4d4;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 100ms ease-out;
+}
+
+.mnemex-graph-reset:hover {
+  border-color: #525252;
+  color: #f5f5f5;
+  transform: scale(1.05);
+}
+
+.mnemex-graph-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  margin: 0;
+  pointer-events: none;
+  font-size: 11px;
+  color: #a3a3a3;
+}
+
+.mnemex-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --------------------------------------------------------------- inspector */
+
+.mnemex-inspector {
+  /* Takes the rest of the column so the panel has no dead strip under it, and scrolls
+     internally when a well-connected node lists more edges than fit. */
+  flex: 1 1 auto;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 12px 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(23, 23, 23, 0.6);
+  box-shadow: inset 0 0 0 1px #262626;
+}
+
+.mnemex-inspector-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mnemex-inspector-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a3a3a3;
+}
+
+.mnemex-inspector-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mnemex-inspector-empty p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a3a3a3;
+}
+
+.mnemex-inspector-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 2px 8px;
+  border: 1px solid #404040;
+  border-radius: 999px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #d4d4d4;
+}
+
+.mnemex-inspector-statement {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #f5f5f5;
+}
+
+.mnemex-inspector-subhead {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a3a3a3;
+}
+
+.mnemex-inspector-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a3a3a3;
+}
+
+.mnemex-inspector-edges {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mnemex-inspector-edges li {
+  font-size: 13px;
+}
+
+.mnemex-inspector-edge-type {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #a3a3a3;
+}
+
+.mnemex-inspector-edge-type[data-dissent="true"] {
+  color: #fbbf24;
+}
+
+.mnemex-inspector-edge-other {
+  margin-left: 8px;
+  color: #d4d4d4;
+}
