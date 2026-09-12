@@ -1,5 +1,6 @@
 // The compiled build is imported the same way web/ imports it, rather than through src/,
 // so this server runs against exactly the code the MCP server runs.
+import { analyze, AnalyzeSchema } from "../../dist/src/tools/analyze.js";
 import { recall, RecallSchema } from "../../dist/src/tools/recall.js";
 import { remember, RememberSchema } from "../../dist/src/tools/remember.js";
 import { timeline, TimelineSchema } from "../../dist/src/tools/timeline.js";
@@ -8,7 +9,7 @@ import { timeline, TimelineSchema } from "../../dist/src/tools/timeline.js";
 // this file a second copy and z.toJSONSchema would be handed foreign schema objects.
 import { z } from "zod";
 
-export type ToolName = "recall" | "remember" | "timeline";
+export type ToolName = "recall" | "remember" | "timeline" | "analyze";
 
 export interface OpenAITool {
   type: "function";
@@ -64,6 +65,46 @@ export const toolDefinitions: OpenAITool[] = [
       parameters: parametersFor(TimelineSchema),
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "analyze",
+      // The model cannot write Cypher against a schema it has never seen, so the schema is
+      // part of the description. Without it the model invents labels and every query fails.
+      description: [
+        "Run a read-only Cypher query against the memory graph for analytical questions that",
+        "recall and timeline cannot answer, such as counts, rankings, aggregates or",
+        "cross-topic comparisons. Prefer recall and timeline; reach for this only when they",
+        "cannot express the question.",
+        "",
+        "The query runs in an isolated sandbox under a read-only credential. Writes are",
+        "refused, so use only MATCH, WHERE, RETURN, ORDER BY, LIMIT and aggregation.",
+        "",
+        "Schema. Nodes: Person {name}, Claim {text}, Decision {statement, status}, Topic",
+        "{name, slug}, Session {title}. Relationships, and the arrow direction matters:",
+        "(Claim)-[:STATED_BY]->(Person), (Claim)-[:SUPPORTS|DISAGREES_WITH]->(Decision),",
+        "(Decision)-[:SUPERSEDES]->(Decision), (Claim|Decision)-[:ABOUT]->(Topic),",
+        "(Claim)-[:IN_SESSION]->(Session), (Decision)-[:DECIDED_IN]->(Session),",
+        "(Person)-[:PARTICIPATED_IN]->(Session). Decision.status is current, superseded or open.",
+        "Every edge points away from the Claim or Decision, never away from the Person, so a",
+        "person is always on the right of STATED_BY. Always alias returned values.",
+        "",
+        // Worked examples, because a small model reads direction far more reliably from a
+        // query it can pattern-match than from a prose description of the schema.
+        "Examples.",
+        "Claims per person, most first:",
+        "MATCH (c:Claim)-[:STATED_BY]->(p:Person)",
+        "RETURN p.name AS person, count(c) AS claims ORDER BY claims DESC",
+        "Who objected most:",
+        "MATCH (c:Claim)-[:DISAGREES_WITH]->(:Decision) MATCH (c)-[:STATED_BY]->(p:Person)",
+        "RETURN p.name AS person, count(c) AS objections ORDER BY objections DESC",
+        "Decisions per topic that are still current:",
+        "MATCH (d:Decision)-[:ABOUT]->(t:Topic) WHERE d.status = 'current'",
+        "RETURN t.name AS topic, count(d) AS decisions ORDER BY decisions DESC",
+      ].join(" "),
+      parameters: parametersFor(AnalyzeSchema),
+    },
+  },
 ];
 
 export function isToolName(name: string): name is ToolName {
@@ -74,6 +115,7 @@ export async function executeTool(name: ToolName, args: unknown): Promise<unknow
   const input = (args ?? {}) as Record<string, unknown>;
   if (name === "recall") return recall(input as never);
   if (name === "remember") return remember(input as never);
+  if (name === "analyze") return analyze(input as never);
   return timeline(input as never);
 }
 
@@ -91,6 +133,11 @@ export function resultPreview(name: ToolName, result: unknown): string {
   }
   if (name === "timeline") {
     return `${(value?.entries ?? []).length} entries for ${value?.topic ?? "topic"}`;
+  }
+  if (name === "analyze") {
+    const rows: unknown[] = value?.rows ?? [];
+    const disabled = (value?.degraded ?? []).includes("analyze:disabled");
+    return disabled ? "sandbox unavailable, query not run" : `${rows.length} row(s)`;
   }
   return `${(value?.claimIds ?? []).length} claim(s) written${value?.decisionId ? ", decision linked" : ""}`;
 }

@@ -377,16 +377,16 @@ pre .m{color:var(--magenta)}
 
 /* ===========================================
    PRINT / PDF: one slide per page, 16:9
-   Rendered at 13.333in x 7.5in, which is 1280x720
-   at 96dpi, so vw/vh and every clamp() resolve to
-   the same layout the deck is validated at.
+   Rendered at 1600x900, a 16:9 page box wide enough
+   that the desktop breakpoints apply and vw/vh
+   resolve to the layout the deck is validated at.
    =========================================== */
 @media print{
-  @page{size:13.333in 7.5in;margin:0}
+  @page{size:1600px 900px;margin:0}
   html,body{height:auto;overflow:visible;background:var(--bg)}
   html{scroll-snap-type:none}
   .slide{
-    width:13.333in;height:7.5in;
+    width:1600px;height:900px;
     break-after:page;page-break-after:always;
     scroll-snap-align:none;
   }
@@ -394,6 +394,29 @@ pre .m{color:var(--magenta)}
   .progress,.dots,.hint{display:none !important}
   /* Keep the dark ground and every accent; browsers drop backgrounds otherwise. */
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+  /* Chrome resolves width/height media queries against the SCREEN viewport while
+     laying out against the page box, so every responsive rule above misfires when
+     printing headless. Pin the scale to what 1600x900 would produce and restate the
+     desktop grids, so the PDF is the desktop composition and not a phone one. */
+  :root{
+    --title-size:86.4px; --h2-size:43.2px;  --h3-size:21.1px;
+    --body-size:16.3px;  --small-size:12.5px; --mono-size:13.1px;
+    --slide-padding:67px; --content-gap:17px; --element-gap:9px;
+  }
+  .g-2{grid-template-columns:repeat(2,1fr)}
+  .g-3{grid-template-columns:repeat(3,1fr)}
+  .g-4{grid-template-columns:repeat(4,1fr)}
+  .split{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr)}
+  .split.narrow-right{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+  .grid{gap:16px}
+  .card{padding:18px}
+  .card p{font-size:var(--body-size);line-height:1.5}
+  .kicker,.corrections{display:block}
+  .slide[data-title="What it does"] pre{display:block}
+  .shot img{max-height:420px}
+  .shot.tall img{max-height:470px;object-fit:contain}
+  .diagram{max-height:430px}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -896,7 +919,7 @@ Marcus   <span class="k">SUPPORTS</span>          1</pre>
           <div class="stat"><span class="num">3s</span><span class="lab">embedding budget</span></div>
           <div class="stat"><span class="num">15s</span><span class="lab">write sandbox</span></div>
           <div class="stat"><span class="num">30s</span><span class="lab">analyze sandbox</span></div>
-          <div class="stat"><span class="num c-lime">642ms</span><span class="lab">measured recall</span></div>
+          <div class="stat"><span class="num c-lime">642ms</span><span class="lab">recall, local embed</span></div>
         </div>
       </div>
       <div class="stack">
